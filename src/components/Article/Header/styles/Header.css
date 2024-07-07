@@ -1,45 +1,25 @@
-
-.margin-right{
-    margin-right: 20px;
-}
-
-.photo-height{
-    height: 30px;
-}
-
-/********** The Header **********/
-
+/* styles/Header.css */
 .header {
-    margin: 20px 70px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-}
-
-/** Right Side of The Header **/
-
-.logo {
-    width: 50px;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
+    width: 100%;
 }
 
 .search {
+    margin: 100px; 
+    width: 100%;
     display: flex;
-    align-items: end;
+    justify-content: center;
 }
 
 .search input {
+    padding: 10px;
     border: none;
     background-color: #000B21;
     height: 20px;
     width: 300px;
-    margin-left: 5px;
 }
-
 .search input::placeholder {
     color: white;
     opacity: 0.8;
@@ -47,19 +27,6 @@
     padding-bottom: 20px;
 }
 
-/** Left Side of The Header **/
-
-.header-left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.post {
-    display: flex;
-    align-items: center;
-}
-
-.post img {
-    margin-right: 5px;
+.search input:focus {
+    outline: none;
 }

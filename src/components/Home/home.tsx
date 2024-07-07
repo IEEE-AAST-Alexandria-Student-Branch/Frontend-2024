@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../App";
 
 export const HomeComp = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const {userData} = useContext(UserContext);
 
   const handleJoinUsClick = () => {
     if (email) {
@@ -45,7 +47,7 @@ export const HomeComp = () => {
             <p>technology, and professional</p>
             <p>development.</p>
           </div>
-          <div className="flex mt-4 p-2 bg-white rounded-3xl w-[60vw] sm:w-96">
+          {userData ? null: <><div className="flex mt-4 p-2 bg-white rounded-3xl w-[60vw] sm:w-96">
             <input
               ref={inputRef}
               className="w-4/6 text-black placeholder-black pl-2 text-sm focus:outline-none bg-transparent"
@@ -66,7 +68,8 @@ export const HomeComp = () => {
           <div className="mt-4 text-sm font-normal">
             <p>Enter your email and become a member.</p>
             <p>No Credit Card Needed.</p>
-          </div>
+          </div></>}
+          
         </div>
       </div>
       <div className="flex flex-col items-center pb-4 z-10">

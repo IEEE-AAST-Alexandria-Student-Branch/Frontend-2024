@@ -1,5 +1,5 @@
 .main-content {
-    margin: 5px 29%;
+    margin: 60px 29%;
     display: flex;
     flex-direction: column;
 }
@@ -11,7 +11,7 @@
     font-family: 'SF-Pro-Display-Bold';
 }
 
-.discription {
+.description {
     font-size: 24px;
     color: white;
     opacity: 0.7;
@@ -24,11 +24,11 @@
     margin: 15px 0px;
 }
 
-.pfp {
+.pfp img{
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: white;
+    margin-top: 10px;
 }
 
 .profile-desc {
@@ -114,4 +114,64 @@
     color: white;
     opacity: 0.8;
     margin: 5px 0px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin: 50px 5%; 
+    }
+
+    .title {
+        font-size: 35px;
+    }
+
+    .description {
+        font-size: 20px; 
+    }
+}
+@media (max-width: 480px) {
+    .main-content {
+        margin: 30px 2%; 
+    }
+
+    .title {
+        font-size: 30px; 
+    }
+
+    .description {
+        font-size: 18px; 
+    }
+
+    .pfp img {
+        width: 40px; 
+        height: 40px; 
+    }
+
+    .desc-title {
+        font-size: 14px; 
+    }
+
+    .desc-time {
+        font-size: 10px; 
+    }
+
+    .like-save-share img {
+        width: 20px; 
+    }
+
+    .like span {
+        font-size: 10px; 
+    }
+
+    .main-content caption {
+        font-size: 10px; 
+    }
+
+    .article-desc {
+        font-size: 14px; 
+    }
+
+    .main-content a {
+        font-size: 12px; 
+    }
 }

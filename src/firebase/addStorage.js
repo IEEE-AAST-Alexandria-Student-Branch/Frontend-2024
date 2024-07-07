@@ -9,7 +9,7 @@ import {
 export default async function addStorage(file, slug) {
   const storageRef = ref(
     storage,
-    `forms/${slug}/${Timestamp.now().nanoseconds}${
+    `${slug}/${Timestamp.now().nanoseconds}${
       Timestamp.now().seconds
     }` +
       "-" +

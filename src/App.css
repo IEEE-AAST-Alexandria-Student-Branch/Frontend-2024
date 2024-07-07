@@ -42,6 +42,12 @@ body {
   height: 40px;
   border-radius: 40px;
 }
+.defaultButton:disabled{
+  background-color: #c2c2c2;
+  color: #4c4c4c;
+  cursor: not-allowed;
+}
+
 .defaultButton:active {
   background-color: #c2c2c2;
 }
@@ -52,7 +58,7 @@ body {
   /* line-height: 5rem; */
   max-width: 600px;
 }
-/* global.css */
+
 
 .customScrollbar::-webkit-scrollbar {
   height: 8px;

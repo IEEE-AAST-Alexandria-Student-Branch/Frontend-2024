@@ -1,14 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import getCollection from '../../firebase/getCollection';
+interface EventHighlight{
+  index: number;
+  url: string;
+}
 
-const images = [
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F0.jpeg?alt=media&token=db7cf383-070b-4574-92b8-d5bd41d0ea3a',
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F1.jpeg?alt=media&token=63b8684d-6c22-43f5-bee7-9b6f2c2aef2a',
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F0.jpeg?alt=media&token=db7cf383-070b-4574-92b8-d5bd41d0ea3a',
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F1.jpeg?alt=media&token=63b8684d-6c22-43f5-bee7-9b6f2c2aef2a',
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F0.jpeg?alt=media&token=db7cf383-070b-4574-92b8-d5bd41d0ea3a',
-  'https://firebasestorage.googleapis.com/v0/b/ieee-aast-system.appspot.com/o/events%2Fhighlights%2F1.jpeg?alt=media&token=63b8684d-6c22-43f5-bee7-9b6f2c2aef2a'
-  
-];
 import {
   Modal,
   ModalOverlay,
@@ -22,6 +18,14 @@ import {
 const EventHighlights = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState('');
+  const [images, setImages] = React.useState<string[]>([]);
+  useEffect(() => {
+  getCollection('highlights').then((data) => {
+    const sortedHighlights = (data.result || []).sort((a: EventHighlight, b: EventHighlight) => a.index - b.index);
+    console.log(sortedHighlights);
+    setImages(sortedHighlights.map((highlight: EventHighlight) => highlight.url));
+  });
+},[])
   const onClose = () => setIsOpen(false);
   const onOpen = (img:string) =>{
     setIsOpen(true);
