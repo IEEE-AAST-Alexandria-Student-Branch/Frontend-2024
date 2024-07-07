@@ -1,7 +1,16 @@
 import { NavBar } from "../components/common/navbar";
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Input, FormControl, FormLabel, FormErrorMessage, Button } from "@chakra-ui/react";
+import { Input, FormControl, FormLabel, FormErrorMessage, Button, Center } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react';
 import register from "../firebase/register";
 import setData from "../firebase/setData";
 
@@ -13,6 +22,12 @@ interface FormData {
 }
 
 export const SignUp = () => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [error, setError] = useState<string>("");
+  const onOpen = (errorString:string) =>{
+    setModalIsOpen(true);
+    setError(errorString);
+  }
   const location = useLocation();
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -20,7 +35,9 @@ export const SignUp = () => {
     email: "",
     password: "",
   });
-  
+
+  const lastNameRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const email = queryParams.get("email");
@@ -50,8 +67,14 @@ export const SignUp = () => {
       setIsValid(true);
       setShowError(false);
       register(formData.email, formData.password).then(res => {
-        console.log(res.result?.user.uid);
-        setData("users", formData, res.result?.user.uid);
+        console.log(res);
+        if(res.error){
+          onOpen(res.error);
+        }
+        else {
+          setData("users", formData, res.result?.user.uid).then(() => {window.location.href = "/home";});
+          
+        }
       });
       
     } else {
@@ -64,6 +87,7 @@ export const SignUp = () => {
   const isErrorPass = formData.password.length < 6;
 
   return (
+    <>
     <div className="form-container">
       <NavBar />
       <div className="flex flex-col justify-center p-16 h-screen">
@@ -92,6 +116,9 @@ export const SignUp = () => {
                 id="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
+                readOnly
+                onFocus={() => { lastNameRef.current?.removeAttribute('readonly'); }}
+                ref={lastNameRef}
                 required
               />
             </FormControl>
@@ -146,5 +173,23 @@ export const SignUp = () => {
         </div>
       </div>
     </div>
+    <Center>
+    <Modal isOpen={modalIsOpen} onClose={() => setModalIsOpen(false)} size="xl">
+      <ModalOverlay />
+      <ModalContent className="top-[30%]">
+        <ModalHeader>Error</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <p>{error}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="blue" onClick={() => setModalIsOpen(false)}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+    </Center>
+    </>
   );
 };
