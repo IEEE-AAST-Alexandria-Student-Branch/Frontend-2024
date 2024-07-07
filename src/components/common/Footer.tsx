@@ -1,26 +1,15 @@
 import FAQ from "../../assets/faq-bubble-white.png";
-import Discord from "../../assets/discord-white.png";
-import Twitter from "../../assets/twitter-white.png";
 import Linkedin from "../../assets/linkedin-white.png";
 import Contact from "../../assets/contact-envelope-white.png";
 import Logo from "../../assets/IEEEAAST.ico";
 import FooterSocialCard from "./FooterSocialCard";
 import "./styles/Footer.css";
+import {Element} from 'react-scroll';
 
 const SocialInfo = [
   {
     title: "Frequently Asked Questions",
     imgSrc: FAQ,
-    link: "https://www.ieee.org/",
-  },
-  {
-    title: "Twitter",
-    imgSrc: Twitter,
-    link: "https://www.ieee.org/",
-  },
-  {
-    title: "Discord",
-    imgSrc: Discord,
     link: "https://www.ieee.org/",
   },
   {
@@ -31,12 +20,13 @@ const SocialInfo = [
   {
     title: "LinkedIn",
     imgSrc: Linkedin,
-    link: "https://www.ieee.org/",
+    link: "https://www.linkedin.com/company/ieeeaast",
   },
 ];
 
 const Footer = () => {
   return (
+    <Element name="contactSection">
     <footer className="footer-container">
       <h2 className="footer-heading">Leading with Passion.</h2>
       <div className="footer-social-links">
@@ -60,6 +50,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
+    </Element>
   );
 };
 

@@ -45,7 +45,7 @@ export const HomeComp = () => {
             <p>technology, and professional</p>
             <p>development.</p>
           </div>
-          <div className="flex mt-4 w-96 p-2 bg-white rounded-3xl">
+          <div className="flex mt-4 p-2 bg-white rounded-3xl w-[60vw] sm:w-96">
             <input
               ref={inputRef}
               className="w-4/6 text-black placeholder-black pl-2 text-sm focus:outline-none bg-transparent"

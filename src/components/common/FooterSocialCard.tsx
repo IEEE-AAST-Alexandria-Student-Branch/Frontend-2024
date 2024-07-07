@@ -1,4 +1,4 @@
-import Arrow from "../../assets/language-arrow-white.png";
+import Arrow from "../../assets/circleArrow.png";
 
 interface FooterSocialCard {
   title: string;
@@ -8,15 +8,17 @@ interface FooterSocialCard {
 
 const FooterSocialCard = ({ title, imgSrc, link }: FooterSocialCard) => {
   return (
+    <a href={link} target="_blank" rel="noreferrer" className="social-icon">
     <div className="social-box">
       <div className="socialmedia">
-        <a href={link} target="_blank" rel="noreferrer" className="social-icon">
+        
           <img src={imgSrc} alt={title} />
-        </a>
+        
         <h4 className="social-title">{title}</h4>
       </div>
-      <img src={Arrow} alt="arrow" />
+      <img className="w-9" src={Arrow} alt="arrow" />
     </div>
+    </a>
   );
 };
 

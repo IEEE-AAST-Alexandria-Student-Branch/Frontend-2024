@@ -52,8 +52,6 @@ body {
   /* line-height: 5rem; */
   max-width: 600px;
 }
-<<<<<<<<< Temporary merge branch 1
-=========
 /* global.css */
 
 .customScrollbar::-webkit-scrollbar {
@@ -71,4 +69,7 @@ body {
 
 .customScrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(222, 52%, 12%);
+}
+html {
+  scroll-behavior: smooth;
 }

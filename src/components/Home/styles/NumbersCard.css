@@ -1,30 +1,77 @@
 .box-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  padding: 20px;
-  max-width: 950px;
-  margin: 0 auto 50px;
+  grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+  margin: 0 80px 50px;
   gap: 15px;
 }
+
 .box {
   background: #f9f7f4;
   border-radius: 20px;
   color: #1f396e;
   padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
+
 .box img {
   width: 80px;
   margin-bottom: 8px;
 }
+
 .box .content {
-  margin-left: 10px;
+  margin-left: 0; /* Remove margin for better centering on mobile */
 }
+
 .box-title {
   font-size: 25px;
   font-weight: bold;
   margin-bottom: 5px;
 }
+
 .box-text {
   font-size: 15px;
   font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .box {
+    flex-direction: row; /* Change to row direction on larger screens */
+    text-align: left;
+  }
+
+  .box img {
+    width: 80px;
+    margin-right: 10px;
+  }
+
+  .box .content {
+    margin-left: 10px; /* Restore margin on larger screens */
+  }
+}
+
+@media (min-width: 1290px) {
+  .box-container {
+    margin: 0 275px 50px;
+  }
+}
+
+@media (max-width: 767px) {
+  .box-container {
+    margin: 0 20px 50px; /* Adjusted margin for better mobile responsiveness */
+  }
+
+  .box {
+    padding: 20px; /* Adjusted padding for better mobile responsiveness */
+  }
+
+  .box-title {
+    font-size: 20px; /* Adjusted font size for better readability on mobile */
+  }
+
+  .box-text {
+    font-size: 14px; /* Adjusted font size for better readability on mobile */
+  }
 }

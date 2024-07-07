@@ -1,3 +1,4 @@
+import {Element} from 'react-scroll';
 import Card from "./Card";
 import NumbersCard from "./NumbersCard";
 
@@ -77,8 +78,9 @@ const branchNumbers = [
 const About = () => {
   return (
     <>
-      <div className="card-container">
-        <h2 className="card-heading font-bold text-4xl mt-20">IEEE Values. Our Core.</h2>
+    <Element name="aboutSection">
+      <div className="card-container" id="aboutSection">
+        <h2 className="card-heading font-bold text-4xl mt-20 ml-9">IEEE Values. &nbsp;Our Core.</h2>
         {cardsData.map((card, index) => (
           <Card key={index} {...card} />
         ))}
@@ -88,6 +90,7 @@ const About = () => {
           <NumbersCard key={index} {...number} />
         ))}
       </div>
+      </Element>
     </>
   );
 };

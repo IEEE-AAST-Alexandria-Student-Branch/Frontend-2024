@@ -9,13 +9,14 @@ import { HomeComp } from "../components/Home/home.tsx";
 import Footer from "../components/common/Footer.tsx";
 import { NavBar } from "../components/common/navbar.tsx";
 // import { Test } from "../components/Home/Test.tsx";
+
 export const Home = () => {
   return (
     <>
-      <NavBar />
-      <HomeComp />
+      <NavBar/>
+      <HomeComp  />
       <Sponsor />
-      <About />
+      <About/>
       <AchievementCarousel />
       <EventHighlights />
       <Volunteers />

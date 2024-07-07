@@ -85,7 +85,7 @@ export const Volunteers = () => {
             <TabList className='bg-[#151F33] rounded-full px-[20px] md:px-[30px] mt-4 gap-1 md:gap-2 justify-around w-fit mx-auto'>
               {years.map((year) => (
                 <Tab key={year} w={'fit-content'} className="px-2 text-base md:text-lg lg:text-xl xl:text-2xl">
-                  <p className='text-base sm:text-lg md:text-xl lg:text-3xl'>{year}</p>
+                  <p className='text-[9vw] sm:text-[40pt]'>{year}</p>
                 </Tab>
               ))  
               }
@@ -97,10 +97,10 @@ export const Volunteers = () => {
                   <Tabs className="relative" variant='unstyled' defaultIndex={0}>
                     <Center>
                       <TabList className="bg-[#151F33] rounded-full px-4 py-1 gap-2">
-                        <Tab className="px-1 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base lg:text-lg">
+                        <Tab w={"80px"} h={"40px"} className="px-1 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base lg:text-lg">
                           Board
                         </Tab>{ showHeads ? (
-                        <Tab className="px-1 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base lg:text-lg">
+                        <Tab w={"80px"} h={"40px"} className="px-1 sm:px-2 md:px-3 text-xs sm:text-sm md:text-base lg:text-lg">
                           Heads
                         </Tab>) : null
                         }

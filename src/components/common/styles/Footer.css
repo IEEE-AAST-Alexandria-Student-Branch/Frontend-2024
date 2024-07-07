@@ -14,9 +14,10 @@
   font-weight: bold;
 }
 .footer-social-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  margin: 100px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 60px 0;
   gap: 30px;
 }
 .social-box {
@@ -24,8 +25,9 @@
   align-items: center;
   justify-content: space-between;
   margin-right: 70px;
+  width:20vw;
 }
-.social-box:not(:nth-last-child(1), :nth-last-child(2)) {
+.social-box {
   border-bottom: 1px solid #f9f7f4;
   padding-bottom: 15px;
 }
@@ -52,4 +54,18 @@
   margin-right: 20px;
   font-weight: 500;
   text-transform: capitalize;
+}
+
+@media (max-width: 940px){
+  .footer-container {
+    padding: 30px 40px;
+  }
+  .social-box {
+    width:75vw;
+    margin:0;
+  }
+  .footer-social-links {
+    flex-direction: column;
+    gap: 30px;
+  }
 }
