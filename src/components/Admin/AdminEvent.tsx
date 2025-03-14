@@ -63,24 +63,23 @@ const AdminEvent: React.FC<AdminEventProps> = ({ event, events, setEvents, setSe
   }, [event]);
   
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-            const starttimeInput = document.querySelector('input[name="starttime"]') as HTMLInputElement;
-            if (starttimeInput) {
-            }
-        // Handle datetime-local input for starttime and endtime
-        if (name === 'starttime' || name === 'endtime') {
-            if(value==='') return undefined;
-            const dateValue = value ? firebase.firestore.Timestamp.fromDate(new Date(value)) : null;
-            setEventData({ ...eventData, [name]: dateValue });
-        } else {
-            setEventData({ ...eventData, [name]: value });
-        }
-        if (name === 'type') {
-            const { type, cardColor, ...rest } = eventData;
-            setEventData({ ...rest, type: value, cardColor: enableColor?cardColor:autoColorByTopic(value) });
-
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    // Handle datetime-local input for starttime and endtime
+    if (name === 'starttime' || name === 'endtime') {
+      if (value === '') return undefined;
+      const dateValue = value ? firebase.firestore.Timestamp.fromDate(new Date(value)) : null;
+      setEventData({ ...eventData, [name]: dateValue });
+    } else {
+      setEventData({ ...eventData, [name]: value });
     }
+
+    if (name === 'type') {
+      const { type, cardColor, ...rest } = eventData;
+      setEventData({ ...rest, type: value === ''? type : value, cardColor: enableColor? cardColor: autoColorByTopic(value) });
+    }
+
+    console.log(event);
   };
 
   // Submit event data form
