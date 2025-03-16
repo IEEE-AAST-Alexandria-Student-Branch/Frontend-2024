@@ -45,4 +45,3 @@ All assets (images, icons, etc.) go in `src/assets/`
 When editing or adding anything please respect the naming convention and keep the directory organized
 
 Happy coding!
-
