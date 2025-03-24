@@ -16,18 +16,15 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  ListItem,
-  List,
   Spinner,
   Center
 } from "@chakra-ui/react";
 import { UserContext } from "../App";
 import getUser from "../firebase/auth";
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
-import { setNewPassword } from "../firebase/updatePassword";
 import addStorage from "../firebase/addStorage";
 import updateData from "../firebase/updateData";
 import getDocument from "../firebase/getData";
+import sendPasswordEmail from "../firebase/sendPasswordResetEmail.js";
 import ArticleCard from "../components/Article/Card/ArticleCard.tsx"
 import subscribeToCollection from "../firebase/subscribeToCollection.js";
 import ArticleData from "../interfaces/ArticleData.tsx";
@@ -40,49 +37,33 @@ import {Social} from "../interfaces/userData.tsx";
 const defaultAvatar = <svg viewBox="0 0 128 128" className="w-full h-full bg-[#A0AEC0] rounded-full" role="img" aria-label=" avatar"><path fill="currentColor" d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.768 25,101.7892 L25,95.2 C25,86.8096 31.981,80 40.6,80 L87.4,80 C96.019,80 103,86.8096 103,95.2 L103,102.1388 Z"></path><path fill="currentColor" d="M63.9961647,24 C51.2938136,24 41,34.2938136 41,46.9961647 C41,59.7061864 51.2938136,70 63.9961647,70 C76.6985159,70 87,59.7061864 87,46.9961647 C87,34.2938136 76.6985159,24 63.9961647,24"></path></svg>;
 
 interface currentUserData {
-  mobile: string;
+  mobile: string|null;
   firstname: string;
   lastname: string;
   desc: string;
   profilePicture: File | null | string;
-  newPassword: string;
-  confirmPassword: string;
-  oldPassword: string;
-  roles?: string[];
   socials?: Social[];
 }
 
 
 export const Profile = () => {
-  const [notMatchError, setNotMatchError] = useState<boolean>(false);
-  const [oldPasswordNotEntered, setOldPasswordNotEntered] = useState<boolean>(false);
-  const [incorrectOldPassword, setIncorrectOldPassword] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>("");
   const [mobileInvalid, setMobileInvalid] = useState<boolean>(false);
+  const [sendEmail, setSendEmail] = useState<boolean>(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [ passnotRegix, setPassNotRegix ] = useState<boolean>(true);
   const [selectedUserData, setSelectedUserData]= useState<UserData>();
   const navigate = useNavigate();
 
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
-  const [_edit, setEdit] = useState<boolean>(false);
+  const [_edit] = useState<boolean>(false);
   const [self, setSelf] = useState<boolean>(false);
   const [articles, setArticles]= useState<ArticleData[]>();
   const { userData, setUserData, userId } = useContext(UserContext);
   const { name: id } = useParams<{ name: string }>();
-  const mobileRegex = /^[0-9]{10}$/;
+  const mobileRegex = /^\+?[1-9]\d{10,14}$/;
   const location = useLocation();
   
-  // password regix
-  const validatePassword = (password: string): boolean => {
-      return (
-          password.length >= 8 &&
-          /[a-z]/.test(password) &&
-          /[A-Z]/.test(password) &&
-          /\d/.test(password) &&
-          /[@$!%*?&]/.test(password)
-      );
-  };
   const purifyConfig = {
     ALLOWED_TAGS: ['br', 'strong', 'em', 'ul', 'ol', 'li'],
   };
@@ -103,26 +84,19 @@ export const Profile = () => {
     lastname: "",
     desc: "",
     profilePicture: null,
-    newPassword: "",
-    confirmPassword: "",
-    oldPassword: "",
-    roles: [],
     socials: []
   });
-
-  useEffect(() => {
-    // Scroll to top immediately when the component mounts
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, []);
-
-useEffect(() => {
-  if (currentUserData.newPassword) {
-    const isPasswordValid = validatePassword(currentUserData.newPassword);
-    setPassNotRegix(!isPasswordValid);
-  } else {
-    setPassNotRegix(true);
-  }
-},[currentUserData])
+  const fetchCurrentUserEmail = async () => {
+    try {
+      const user = await getUser();
+      if (user && user.email) {
+        setUserEmail(user.email);
+      }
+    } catch (error) {
+      console.error("Error fetching current user email:", error);
+      return null;
+    }
+  };
   // Fetch user data and check if the `id` matches the logged-in user ID
   useEffect(() => {
     const fetchData = async () => {
@@ -131,7 +105,7 @@ useEffect(() => {
         if (id === userId) {
           setSelf(true);
         }
-
+        fetchCurrentUserEmail();
         setSelectedUserData(result.data() as UserData)
         
         setCurrentUserData({
@@ -140,10 +114,6 @@ useEffect(() => {
           lastname: result.data()?.lastname || "",
           desc: result.data()?.desc || "",
           profilePicture: result.data()?.imgurl || null,
-          newPassword: "",
-          confirmPassword: "",
-          oldPassword: "",
-          roles: result.data()?.roles || [],
           socials: result.data()?.socials || []
         });
       }
@@ -223,46 +193,10 @@ useEffect(() => {
     console.log(storedcurrentUserData);
     event.preventDefault();
     const user = await getUser();
-    const { newPassword, confirmPassword, oldPassword, mobile, profilePicture } = currentUserData;
-
-    if (newPassword !== "") {
-      if (newPassword !== confirmPassword) {
-        setShowError(true);
-        setErrorMessage("New and Confirm Password do not match!");
-        setNotMatchError(true);
-        return;
-      }
-
-      if (oldPassword === "") {
-        setOldPasswordNotEntered(true);
-        setShowError(true);
-        setErrorMessage("Please enter your old password.");
-        return;
-      }
-
-      let credential = EmailAuthProvider.credential(userData?.email!, oldPassword);
-
-      try {
-        await reauthenticateWithCredential(user, credential);
-        if(!validatePassword(newPassword)){
-          setShowError(true);
-          return;
-        }
-        else {
-          setPassNotRegix(false)
-        }
-        await setNewPassword(user, newPassword);
-        setEdit(true);
-      } catch (error) {
-        setShowError(true);
-        setIncorrectOldPassword(true);
-        setErrorMessage("Password is incorrect!");
-        return;
-      }
-    }
+    const { mobile, profilePicture } = currentUserData;
 
     if (profilePicture) {
-      console.log(currentUserData.profilePicture)
+      console.log(currentUserData.profilePicture);
       if (typeof profilePicture !== "string") {
         const res = await addStorage(currentUserData.profilePicture, `profilepics/${user.uid}`);
         storedcurrentUserData.imgurl = res.link;
@@ -270,7 +204,9 @@ useEffect(() => {
     }
 
     if (mobile !== "" && mobile !== userData!.mobile) {
-      if (!mobileRegex.test(mobile)) {
+      if (mobile === "") {
+        storedcurrentUserData.mobile = null;
+      } else if (mobile&&!mobileRegex.test(mobile)) {
         setShowError(true);
         setMobileInvalid(true);
         setErrorMessage("Invalid mobile number, Please enter a valid number");
@@ -282,33 +218,12 @@ useEffect(() => {
       const filteredSocials = currentUserData.socials?.filter(social => social.url !== "");
       await updateData("users", user.uid, { ...storedcurrentUserData, socials: filteredSocials });
 
-      if (currentUserData.newPassword !== "") {
-      try {
-        let credential = EmailAuthProvider.credential(userData?.email!, currentUserData.oldPassword);
-        await reauthenticateWithCredential(user, credential);
-
-        if (!validatePassword(currentUserData.newPassword)) {
-        setShowError(true);
-        setErrorMessage("Password does not meet the required criteria.");
-        return;
-        }
-
-        await setNewPassword(user, currentUserData.newPassword);
-        setPassNotRegix(false);
-      } catch (error) {
-        setShowError(true);
-        setIncorrectOldPassword(true);
-        setErrorMessage("Failed to change password. Please check your old password.");
-        return;
-      }
-      }
-
       setShowSuccess(true);
       setTimeout(() => {
-      setShowSuccess(false);
-      setTimeout(() => {
-        navigate(0);
-      }, 500);
+        setShowSuccess(false);
+        setTimeout(() => {
+          navigate(0);
+        }, 500);
       }, 1000);
     } catch (error) {
       console.error("Error updating user data:", error);
@@ -318,10 +233,7 @@ useEffect(() => {
   };
 
   const resetError = () => {
-    setNotMatchError(false);
-    setOldPasswordNotEntered(false);
     setMobileInvalid(false);
-    setIncorrectOldPassword(false);
     setShowError(false);
   };
 
@@ -337,7 +249,7 @@ useEffect(() => {
       <Slide direction="top" in={showSuccess} style={{ zIndex: 300 }}>
         <Alert status="success" variant="solid" zIndex={300}>
           <AlertIcon />
-          Data edited and uploaded successfully!
+          {sendEmail?"Check your inbox for a password reset email!":"Data edited and uploaded successfully!"}
         </Alert>
       </Slide>
       <div className="pt-[100px] mx-8 md:mx-32 flex flex-col justify-center">
@@ -463,7 +375,7 @@ useEffect(() => {
                         <Input
                           type="tel"
                           id="mobile"
-                          value={currentUserData.mobile}
+                          value={currentUserData.mobile||""}
                           name="phoneNumber"
                           onChange={handleChange}
                           placeholder="Mobile Number"
@@ -485,6 +397,7 @@ useEffect(() => {
                         <Textarea
                         className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 h-[200px] md:h-[300px] box-border resize-y"
                           id="desc"
+                          resize={"none"}
                           name="Description"
                           value={convertBRTagsToNewLines(currentUserData.desc)}
                           onChange={handleChange}
@@ -493,84 +406,6 @@ useEffect(() => {
                           flexWrap={"wrap"}
                           flex={"flexbox"}
                         />
-                      </FormControl>
-
-                      <Text fontFamily={'SF-Pro-Display-Bold'} mb={2}>Change your password: </Text>
-                      <FormControl isInvalid={(showError && notMatchError) || (showError && passnotRegix)}>
-                        <Input
-                          type="password"
-                          id="newPassword"
-                          name="Password"
-                          onChange={handleChange}
-                          placeholder="New Password"
-                          mb={4}
-                          style={{
-                            width: '80%',
-                            border: 'none',
-                            borderBottom: '1px solid rgb(4, 4, 62)',
-                            outline: 'none',
-                          }}
-                        />
-                        <Input
-                          type="password"
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          mb={4}
-                          onChange={handleChange}
-                          placeholder="Confirm New Password"
-                          style={{
-                            width: '80%',
-                            border: 'none',
-                            borderBottom: '1px solid rgb(4, 4, 62)',
-                            outline: 'none',
-                          }}
-                        />
-                        {!passnotRegix
-                          ? <FormErrorMessage mb={4} fontFamily={"SF-Pro-Text-Medium"}>
-                              {errorMessage}
-                            </FormErrorMessage>
-                          : <FormErrorMessage mb={4} fontFamily={"SF-Pro-Text-Medium"}>
-                              <List spacing={1} mt={2}>
-                                {passnotRegix && (
-                                  <ListItem>Invalid Password! Passwords should:</ListItem>
-                                )}
-                                <ListItem>
-                                  {!currentUserData.newPassword || currentUserData.newPassword.length < 8 ? "! Be at least 8 characters long" : null}
-                                </ListItem>
-                                <ListItem>
-                                  {!currentUserData.newPassword || !/[a-z]/.test(currentUserData.newPassword) ? "! Contain at least one lowercase letter" : null}
-                                </ListItem>
-                                <ListItem>
-                                  {!currentUserData.newPassword || !/[A-Z]/.test(currentUserData.newPassword) ? "! Contain at least one uppercase letter" : null}
-                                </ListItem>
-                                <ListItem>
-                                  {!currentUserData.newPassword || !/\d/.test(currentUserData.newPassword) ? "! Contain at least one digit" : null}
-                                </ListItem>
-                                <ListItem>
-                                  {!currentUserData.newPassword || !/[@$!%*?&]/.test(currentUserData.newPassword) ? "! Contain at least one special character (e.g., !@#$%^&*)" : null}
-                                </ListItem>
-                              </List>
-                            </FormErrorMessage>
-                        }
-                      </FormControl>
-
-                      <FormControl isInvalid={showError && (oldPasswordNotEntered || incorrectOldPassword)}>
-                        <Input
-                          type="password"
-                          id="oldPassword"
-                          name="oldPassword"
-                          onChange={handleChange}
-                          placeholder="Old Password"
-                          style={{
-                            width: '80%',
-                            border: 'none',
-                            borderBottom: '1px solid rgb(4, 4, 62)',
-                            outline: 'none',
-                          }}
-                        />
-                        <FormErrorMessage mb={4} fontFamily={"SF-Pro-Text-Medium"}>
-                          {errorMessage}
-                        </FormErrorMessage>
                       </FormControl>
                         <Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Social Media Links: </Text>
                         <FormControl mb={4} isInvalid={showError && !currentUserData.socials?.every(social => social.url === "" || isValidUrl(social.url))}>
@@ -623,6 +458,36 @@ useEffect(() => {
                             {errorMessage}
                           </FormErrorMessage>
                         </FormControl>
+                        <Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Change Password: </Text>
+                        <FormControl mb={4}>
+                          <button
+                            className="defaultButton"
+                            type="button"
+                            style={{
+                              fontSize: '16px',
+                              fontFamily: 'SF-Pro-Display-Bold',
+                              width: '155px',
+                              height: '35px',
+                            }}
+                            onClick={async () => {
+                              try {
+                                await sendPasswordEmail(userEmail);
+                                setSendEmail(true);
+                                setShowSuccess(true);
+                                setTimeout(() => {
+                                  setShowSuccess(false);
+                                  setSendEmail(false);
+                                }, 3000);
+                              } catch (error) {
+                                console.error("Error sending password reset email:", error);
+                                setShowError(true);
+                                setErrorMessage("An error occurred while sending the password reset email.");
+                              }
+                            }}
+                          >
+                            Change Password
+                          </button>
+                        </FormControl>
 
                       <div className="flex flex-nowrap">
                         <div className="pt-8 flex flex-nowrap items-center gap-4 flex-col">
@@ -655,9 +520,6 @@ useEffect(() => {
                               currentUserData.mobile === selectedUserData?.mobile &&
                               currentUserData.desc === selectedUserData?.desc &&
                               currentUserData.profilePicture === selectedUserData?.imgurl &&
-                              currentUserData.newPassword === "" &&
-                              currentUserData.confirmPassword === "" &&
-                              currentUserData.oldPassword === "" &&
                               JSON.stringify(currentUserData.socials) === JSON.stringify(selectedUserData?.socials)
                               }
                             >

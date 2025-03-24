@@ -1,8 +1,11 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Input, FormControl, FormErrorMessage } from "@chakra-ui/react";
+import { Input, FormControl, FormErrorMessage, Slide, Alert, AlertIcon } from "@chakra-ui/react";
 import signIn from "../firebase/signin";
 import Triangle from "../assets/bg-triangle-ellipse@2x.png"
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button } from "@chakra-ui/react";
+import getUser from "../firebase/auth";
+import sendPasswordEmail from "../firebase/sendPasswordResetEmail";
 
 interface FormData {
   firstName: string;
@@ -21,6 +24,23 @@ export const Signin = () => {
   });
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [showSentEmail, setShowSentEmail] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const onClose = () => setIsOpen(false);
+  const fetchCurrentUserEmail = async () => {
+    try {
+      const user = await getUser();
+      if (user && user.email) {
+        setResetEmail(user.email);
+      }
+    } catch (error) {
+      console.error("Error fetching current user email:", error);
+      return null;
+    }
+  };
+
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setShowError(false);
@@ -31,7 +51,7 @@ export const Signin = () => {
     });
   };
   useEffect(() => {
-      window.scrollTo(0, 0);
+    fetchCurrentUserEmail();
     }, []);
 
   const goback = () => {
@@ -55,12 +75,18 @@ export const Signin = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-fit">
+        <Slide direction="top" in={showSentEmail} style={{ zIndex: 300 }}>
+        <Alert status="success" variant="solid" zIndex={300}>
+          <AlertIcon />
+          If your email exists in our system, we've sent you a password reset email. Check your inbox!
+        </Alert>
+      </Slide>
       <div className="h-screen w-[1vh] absolute left-0" style={{
         backgroundImage: "linear-gradient(to bottom, #1F396E, #1D0021)"
       }}></div>
       <div className="form-container" style={{backgroundImage: `url(${Triangle})`, backgroundSize:"20%", backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom'}}>
-        <div className="p-20 h-screen ">
+        <div className="p-20 min-h-screen">
           <div className="max-w-[600px] sm:mt-40  max-sm:mt-10" style={{}}>
             <h1 className="text-center sm:text-left text-4xl sm:text-4xl mb-8" style={{ fontWeight: 'bold' }}>
               Let's Sign you in!
@@ -84,7 +110,7 @@ export const Signin = () => {
 
                   }}
                 />
-
+                <div className="flex flex-col">
                 <Input
                   type="password"
                   id="password"
@@ -101,6 +127,8 @@ export const Signin = () => {
                     outline: 'none',
                   }}
                 />
+                <span className="px-4 text-blue-500 cursor-pointer w-44" onClick={()=>setIsOpen(true)}>Forgot password?</span>
+                </div>
 
                 {showError && (
                   <FormErrorMessage>
@@ -140,6 +168,46 @@ export const Signin = () => {
           </div>
         </div>
       </div>
+          <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <ModalOverlay />
+            <ModalContent backgroundColor={"#151F33"}>
+              <ModalHeader>Reset Password</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </FormControl>
+              </ModalBody>
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3}
+                isLoading={sendingEmail}
+                disabled={sendingEmail}
+                loadingText="Sending Email..."
+                onClick={async()=>{
+                  setSendingEmail(true);
+                  await sendPasswordEmail(resetEmail)
+                  setShowSentEmail(true)
+                  onClose()
+                  setTimeout(() => {
+                    setShowSentEmail(false)
+                    setSendingEmail(false)
+                  }
+                  , 3000)
+                  }}>
+                  Send Reset Email
+                </Button>
+                <Button colorScheme="red" onClick={onClose}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
     </div>
   );
 };

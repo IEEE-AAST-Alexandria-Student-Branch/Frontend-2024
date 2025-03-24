@@ -91,7 +91,7 @@ export const SignUp = () => {
         }}
       ></div>
       <div className="form-container relative z-10" style={{backgroundImage: `url(${Triangle})`, backgroundSize:"20%", backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom'}}>
-        <div className="p-20 h-screen">
+        <div className="p-20 min-h-screen">
           <div className="max-w-[600px] mt-40 max-sm:mt-10">
             <h1 className="text-4xl sm:text-4xl" style={{ fontWeight: "bold" }}>
               Let's get to know each other

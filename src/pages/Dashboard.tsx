@@ -168,7 +168,7 @@ export const Dashboard = () => {
         <div className="mt-[30px] lg:mt-[59px]">
           <div className="flex gap-[20px]">
 
-          <div className="flex flex-col sm:flex sm:flex-row overflow-y-visible gap-[5px] md:gap-[10px] mb-16 justify-around w-full">
+          <div className="flex flex-col sm:flex sm:flex-row overflow-y-hidden gap-[5px] md:gap-[10px] mb-16 justify-around w-full py-10">
             {loadingEvents? <Spinner size="xl" />
             :filterEvents.map((event)=>(
               <EventCard event={event}/>

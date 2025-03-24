@@ -140,7 +140,7 @@ export const ViewAllArticles = () => {
         </div>
 
         <div className="w-full px-4">
-          <div className="mt-[20px]  md:mt-[30px]  lg:mt-[59px] flex flex-col gap-[30px] md:gap-[30px] lg:gap-[58px]">
+          <div className="mt-[20px]  md:mt-[30px]  lg:mt-[59px] flex flex-col gap-[30px] md:gap-[30px] lg:gap-[58px] overflow-hidden mb-12">
             {filteredArticles.length === 0 ? (
               <>
               <div className="text-center text-white font-extrabold text-2xl">No articles found with that topic.</div>
