@@ -5,8 +5,8 @@ import updateData from '../../firebase/updateData';
 import { Button, LightMode } from '@chakra-ui/react';
 import GrayProfile from '../../assets/profile-person-white@2x.png';
 import { MdSave } from 'react-icons/md';
+import { roles as availableRoles } from '../../utils';
 
-const availableRoles = ['admin', 'writer'];
 interface AdminUserProps {
   selectedUser: IdUserData;
   setSelectedUser: (user: IdUserData) => void;

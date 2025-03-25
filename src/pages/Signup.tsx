@@ -61,9 +61,18 @@ export const SignUp = () => {
         roles: [],
         following: { events: [], users: [] }
       };
-      const res = await register(formData.email, formData.password);
-      await setData("users", storedFormData, res.result?.user.uid);
-      navigate("/verify");
+
+      try {
+        const res = await register(formData.email, formData.password);
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        await setData("users", storedFormData, res.result?.user.uid);
+        navigate("/verify");
+      } catch (error: any) {
+        console.error("Error during registration:", error.message);
+        alert(`Registration failed: ${error.message}`);
+      }
     } else {
       setShowError(true);
     }

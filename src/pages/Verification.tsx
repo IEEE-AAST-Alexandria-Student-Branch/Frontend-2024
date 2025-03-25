@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase/config.js";
 import { Spinner } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import Triangle from "../assets/bg-triangle-ellipse@2x.png"
 
 
 export const Verifying = () => {
@@ -45,7 +46,7 @@ export const Verifying = () => {
           <p className="pb-4 text-left ">Once you've clicked it, click the "Finish" button.</p>
           <p className="pb-8 text-left text-[10pt] text-gray-500">If you can't find it, try checking your spam folder.</p>
           <div className="fixed bottom-0 w-80 h-auto right-0 p-4">
-            <img src="src\assets\bg-triangle-ellipse@2x.png" alt="Triangle" />
+            <img src={Triangle} alt="Triangle" />
           </div>
           {/* <Link to="/onboard"> */}
           <button className="bg-white text-black text-sm font-bold py-2 px-4 w-36 border-2 border-white rounded-full m-2 " onClick={reloadPage}>

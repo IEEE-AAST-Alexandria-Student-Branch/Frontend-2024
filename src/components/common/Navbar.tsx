@@ -14,6 +14,7 @@ import Write from "../../assets/write.png";
 import { LogoButton } from "./LogoButton.js";
 import UserData from "../../interfaces/userData.js";
 import { Avatar } from "@chakra-ui/react";
+import Admin from "../../assets/admin.png";
 
 
 interface ArticleData {
@@ -58,7 +59,6 @@ export const NavBar: React.FC = () => {
   const [showSearch, setShowSearch] = useState(true)
 
   const navigate = useNavigate();
-
   useEffect(() => {
     getCollection("articles").then((res) => {
       if (res.result) {
@@ -202,14 +202,22 @@ export const NavBar: React.FC = () => {
           <div className="flex justify-center gap-3 ml-5 w-full">
             <button>
               <Link to="/" >
-                <div className="border-2 rounded-full border-white w-[40px]">
+                <div
+                  className={`border-2 rounded-full border-white w-[40px] transition-transform duration-200 ${
+                  location.pathname === "/" && "scale-125 shadow-[0_0_10px_1px_#ffffff]"
+                  }`}
+                >
                   <img src={Home} alt="Home" height={90} width={45} />
                 </div>
               </Link>
             </button>
             <button>
               <Link to="/browse" >
-                <div className="border-2 rounded-full border-white w-[40px] p-1">
+                <div
+                  className={`border-2 rounded-full border-white w-[40px] transition-transform duration-200 p-1 ${
+                  location.pathname === "/browse" && "scale-125 shadow-[0_0_10px_1px_#ffffff]"
+                  }`}
+                >
                   <img src={Browse} alt="Browse" height={90} width={45} />
                 </div>
               </Link>
@@ -261,11 +269,28 @@ export const NavBar: React.FC = () => {
             {/* End of searchbar */}
 
             <div className="flex gap-2 mr-4">
+              {userData?.roles?.includes("admin") &&
+                <button>
+                <Link to="/admin" >
+                  <div
+                    className={`border-2 rounded-full border-white w-[40px] transition-transform duration-200 p-1 ${
+                      location.pathname === "/admin" && "scale-125 shadow-[0_0_10px_1px_#ffffff]"
+                    }`}
+                  >
+                    <img src={Admin} alt="Admin" height={90} width={45} />
+                  </div>
+                </Link>
+              </button>  
+                }
               {
                 (userData?.roles?.includes("admin") || userData?.roles?.includes("author")) &&
                   <button>
                     <Link to="/write" >
-                      <div className="border-2 rounded-full border-white w-[40px] p-1">
+                      <div
+                        className={`border-2 rounded-full border-white w-[40px] transition-transform duration-200 p-1 ${
+                          location.pathname === "/write" && "scale-125 shadow-[0_0_10px_1px_#ffffff]"
+                        }`}
+                      >
                         <img src={Write} alt="Write Article" height={90} width={45} />
                       </div>
                     </Link>
@@ -273,7 +298,11 @@ export const NavBar: React.FC = () => {
               }
               <button>
                 <Link to="/bookmarks">
-                  <div className="border-2 rounded-full border-white w-[40px] p-[7px]">
+                  <div
+                    className={`border-2 rounded-full border-white w-[40px] transition-transform duration-200 p-[7px] ${
+                      location.pathname === "/bookmarks" && "scale-125 shadow-[0_0_10px_1px_#ffffff]"
+                    }`}
+                  >
                     <img src={Bookmark} alt="Bookmarks" height={90} width={45} />
                   </div>
                 </Link>

@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FormEvent, useContext, useEffect } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
   Input,
   FormControl,
@@ -17,22 +17,33 @@ import {
   Tab,
   TabPanel,
   Spinner,
-  Center
+  Center,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton
 } from "@chakra-ui/react";
 import { UserContext } from "../App";
 import getUser from "../firebase/auth";
 import addStorage from "../firebase/addStorage";
 import updateData from "../firebase/updateData";
 import getDocument from "../firebase/getData";
+import getDocumentsById from "../firebase/getDocumentsById";
 import sendPasswordEmail from "../firebase/sendPasswordResetEmail.js";
 import ArticleCard from "../components/Article/Card/ArticleCard.tsx"
 import subscribeToCollection from "../firebase/subscribeToCollection.js";
 import ArticleData from "../interfaces/ArticleData.tsx";
-import { convertNewLinesToBRTags, convertBRTagsToNewLines, toggleFollow } from "../utils.ts";
+import { convertNewLinesToBRTags, convertBRTagsToNewLines } from "../utils.ts";
 import UserData from "../interfaces/userData.tsx";
 import { SocialIcon } from "../components/common/SocialIcon.tsx";
 import DOMPurify from "dompurify";
 import {Social} from "../interfaces/userData.tsx";
+import { FollowButton } from "../components/common/FollowButton.tsx";
+import { HoverIcon } from "../components/common/HoverIcon.tsx";
+import IEEELogoSmall from "../assets/ieeesmall.png";
+import Admin from "../assets/admin.png";
 
 const defaultAvatar = <svg viewBox="0 0 128 128" className="w-full h-full bg-[#A0AEC0] rounded-full" role="img" aria-label=" avatar"><path fill="currentColor" d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.768 25,101.7892 L25,95.2 C25,86.8096 31.981,80 40.6,80 L87.4,80 C96.019,80 103,86.8096 103,95.2 L103,102.1388 Z"></path><path fill="currentColor" d="M63.9961647,24 C51.2938136,24 41,34.2938136 41,46.9961647 C41,59.7061864 51.2938136,70 63.9961647,70 C76.6985159,70 87,59.7061864 87,46.9961647 C87,34.2938136 76.6985159,24 63.9961647,24"></path></svg>;
 
@@ -44,7 +55,10 @@ interface currentUserData {
   profilePicture: File | null | string;
   socials?: Social[];
 }
-
+interface IdUserData{
+  id: string;
+  data: UserData;
+}
 
 export const Profile = () => {
   const [userEmail, setUserEmail] = useState<string>("");
@@ -53,6 +67,8 @@ export const Profile = () => {
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [selectedUserData, setSelectedUserData]= useState<UserData>();
+  const [showFollowersModal, setShowFollowersModal] = useState<boolean>(false);
+  const [showFollowingModal, setShowFollowingModal] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -77,6 +93,10 @@ export const Profile = () => {
     }
   };
 
+  const getUsers = async (ids: string[]) => {
+    const users = await getDocumentsById("users", ids);
+    return users.documents
+  };
   // Define currentUserData state
   const [currentUserData, setCurrentUserData] = useState<currentUserData>({
     mobile: "",
@@ -86,6 +106,42 @@ export const Profile = () => {
     profilePicture: null,
     socials: []
   });
+
+  const [followers, setFollowers] = useState<IdUserData[]>();
+  const [following, setFollowing] = useState<IdUserData[]>();
+
+  const setTargetFollowers = (
+    listSetter: React.Dispatch<React.SetStateAction<IdUserData[] | undefined>>,
+    userId: string,
+    newFollowers: string[]
+  ) => {
+    listSetter((prevList) => {
+      if (!prevList) return prevList;
+      return prevList.map((user) =>
+        user.id === userId
+          ? { ...user, data: { ...user.data, followers: newFollowers } }
+          : user
+      );
+    });
+  };
+
+  const setCurrentFollowing = (
+    setUserData: React.Dispatch<React.SetStateAction<UserData | null>>,
+    newFollowing: { users: string[] }
+  ) => {
+    setUserData((prevUserData) => {
+          if (!prevUserData) return null;
+          return {
+            ...prevUserData,
+            following: {
+              ...newFollowing,
+              events: prevUserData.following?.events || [],
+            },
+          };
+        });
+  };
+
+
   const fetchCurrentUserEmail = async () => {
     try {
       const user = await getUser();
@@ -134,7 +190,6 @@ export const Profile = () => {
       })
       return () => unsubscribe();
     };
-
     fetchData();
   }, [id, userData, userId]);
 
@@ -273,12 +328,29 @@ export const Profile = () => {
         </div>
         <Tabs size='sm' variant={'unstyled'}>
           <div className="flex  justify-between items-center flex-wrap">
+            
             <div className="flex flex-col">
-              <p className="text-2xl font-extrabold font-textmedium md:ml-16"> {currentUserData.firstname} {currentUserData.lastname}</p>
+              <div className="flex gap-2 items-center"><p className="text-2xl font-extrabold font-textmedium md:ml-16"> {currentUserData.firstname} {currentUserData.lastname}</p>
+              {selectedUserData.roles?.includes("admin") && <HoverIcon src={Admin} alt="Site Admin" hoverText="This user is a website admin!" />}
+              {selectedUserData.roles?.includes("volunteer") && <HoverIcon src={IEEELogoSmall} alt="Site Admin" hoverText="This user is an IEEE AAST volunteer!"/>}
+              </div>
               <div className="flex gap-[10px] items-center font-extralight md:ml-16 mb-7 md:mb-0">
-              <Text className="text-sm">{selectedUserData?.followers?.length || 0} Followers</Text>
+              <Text className="text-sm cursor-pointer" onClick={async () => {
+                if (selectedUserData.followers.length > 0) {
+                  const users = await getUsers(selectedUserData?.followers);
+                  setFollowers(users);
+                }
+                setShowFollowersModal(true);
+              }}>{selectedUserData?.followers?.length || 0} {selectedUserData?.followers.length===1 ?"Follower":"Followers"}</Text>
               •︎
-              <Text className="text-sm">{selectedUserData?.following?.users?.length || 0} Following</Text>
+              <Text className="text-sm cursor-pointer" onClick={
+                async () => {
+                  if (selectedUserData.following.users.length > 0) {
+                  const users = await getUsers(selectedUserData?.following.users);
+                  setFollowing(users);
+                  }
+                  setShowFollowingModal(true);}
+              }>{selectedUserData?.following?.users?.length || 0} Following</Text>
               <div className="flex gap-1">
                 {selectedUserData?.socials?.map((social, index) => {
                   return (
@@ -288,31 +360,36 @@ export const Profile = () => {
                 </div>
               </div>
               </div>
-              <div className="flex justify-center flex-wrap-reverse  w-full lg:justify-end ">
               <TabList>
                 <Tab>About</Tab>
                 <Tab>Articles</Tab>
                 {/*<Tab>Contributions</Tab> disabled for now*/ }
                 {/*self && <Tab>Settings</Tab>*/}
                 {/*!self&&<button className="defaultButton my-auto">Follow</button>*/}
-              </TabList>
-              {self && <Tab>Settings</Tab>}
-              {!self && 
-                <button 
-                  className="defaultButton my-auto"
-                  onClick={() => {
-                    if (userData && selectedUserData && id && userId) {
-                      toggleFollow(selectedUserData, userData, id, userId, setSelectedUserData, setUserData)
-                    }
-                  }}
-                >
-                  {userId && 
-                    selectedUserData?.followers.includes(userId)
-                      ? "Unfollow"
-                      : "Follow"
-                  }
-                </button>
+                {self && <Tab>Settings</Tab>}
+                {(!self&&id&&userId) && 
+                <FollowButton
+                targetUserData={selectedUserData}
+                currentUserData={userData}
+                targetUserId={id}
+                currentUserId={userId}
+                setTargetFollowers={(userId, updatedFollowers) =>
+                  setTargetFollowers(setFollowers, userId, updatedFollowers)
+                }
+                setCurrentFollowing={(userId, updatedFollowing) =>
+                {
+                  userId;
+                  setCurrentFollowing(setUserData, { users: updatedFollowing })
+                }
+                }
+                className="my-auto"
+              />
               }
+              </TabList>
+              
+
+              <div className="flex justify-center flex-wrap-reverse  w-full lg:justify-end ">
+              
             </div>
           </div>
 
@@ -539,6 +616,109 @@ export const Profile = () => {
         </Tabs>
       </div>
       <div className=" w-full flex justify-center h-fit"></div>
+      <Modal isOpen={showFollowersModal} onClose={() => setShowFollowersModal(false)} isCentered>
+        <ModalOverlay />
+          <ModalContent backgroundColor={"#151F33"}>
+        <ModalHeader fontSize={"2xl"}>Followers</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center">
+          
+            {showFollowersModal && selectedUserData?.followers && selectedUserData.followers.length > 0 ?(
+          
+            followers?.map((user, index) => (
+                <div
+                key={index}
+                className="flex gap-4 items-center justify-between hover:bg-[#223457] p-2 rounded-xl transition-colors duration-200 w-full cursor-pointer"
+                >
+                <Link
+                  className="flex gap-4 items-center"
+                  to={`/profile/${user.id}`}
+                  onClick={() => setShowFollowersModal(false)}
+                >
+                  <Avatar size="md" src={user.data.imgurl} />
+                  <p>{user.data.firstname} {user.data.lastname}</p>
+                </Link>
+                {(id && userId && user.id !== userId) && 
+
+                <FollowButton
+                targetUserData={user.data}
+                currentUserData={userData}
+                targetUserId={user.id}
+                currentUserId={userId}
+                setTargetFollowers={(userId, updatedFollowers) =>
+                  setTargetFollowers(setFollowers, userId, updatedFollowers)
+                }
+                setCurrentFollowing={(userId, updatedFollowing) =>
+                  {
+                    userId;
+                    setCurrentFollowing(setUserData, { users: updatedFollowing })}
+                }
+                className="follow-button ml-auto"
+                />
+              }
+                </div>
+            ))
+          
+            ) :
+           <p className="text-2xl font-bold">You don't have any followers yet!</p>
+            
+            }
+        </ModalBody>
+          </ModalContent>
+      </Modal>
+
+      <Modal isOpen={showFollowingModal} onClose={() => setShowFollowingModal(false)} isCentered>
+        <ModalOverlay />
+          <ModalContent backgroundColor={"#151F33"}>
+        <ModalHeader fontSize={"2xl"}>Following</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center ">
+          
+            {showFollowingModal && selectedUserData?.following?.users && selectedUserData.following.users.length > 0 ?(
+          
+            following?.map((user, index) => (
+                <Link
+                key={index}
+                className="flex gap-4 items-center hover:bg-[#223457] p-2 rounded-xl transition-colors duration-200 w-full cursor-pointer"
+                to={`/profile/${user.id}`}
+                onClick={(e) => {
+                if ((e.target as HTMLElement).closest(".follow-button")) {
+                e.preventDefault();
+                } else {
+                setShowFollowingModal(false);
+                }
+                }}
+                >
+                <Avatar size="md" src={user.data.imgurl} />
+                <p>{user.data.firstname} {user.data.lastname}</p>
+                {(id && userId && user.id !== userId) && 
+
+                <FollowButton
+                  targetUserData={user.data}
+                  currentUserData={userData}
+                  targetUserId={user.id}
+                  currentUserId={userId}
+                  setTargetFollowers={(userId, updatedFollowers) =>
+                  setTargetFollowers(setFollowing, userId, updatedFollowers)
+                  }
+                  setCurrentFollowing={(userId, updatedFollowing) =>
+                  {
+                    userId;
+                    setCurrentFollowing(setUserData, { users: updatedFollowing })}
+                  }
+                  className="follow-button ml-auto"
+                />
+                }
+                </Link>
+            ))
+          
+            ) :
+           <p className="text-2xl font-bold my-auto">{self?"You are not following anyone yet!":"This user is not following anyone yet."}</p>
+            
+          }
+        </ModalBody>
+          </ModalContent>
+      </Modal>
     </div>
   );
 };

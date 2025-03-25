@@ -36,6 +36,10 @@ export const articleTopics = [
   "Game"
 ];
 
+export const roles = [
+  "admin",
+  "writer",
+  "volunteer"];
 export const autoColorByTopic = (topic: string): string => {
   const event = eventTypesWithColors.find(event => event.type === topic);
   return event ? event.color : "#A3A3A3";
@@ -144,56 +148,52 @@ export const toggleBookMark = async (
 }
 
 export const toggleFollow = async (
-  followed: userData,
-  follower: userData,
-  followedId: string,
-  followerId: string,
-  setFollowedData: Function,
-  setFollowerData: Function,
+  targetUser: userData,
+  currentUser: userData,
+  targetUserId: string,
+  currentUserId: string,
+  updateFollowers: (userId: string, updatedFollowers: string[]) => void,
+  updateFollowing: (userId: string, updatedFollowing: string[]) => void,
 ) => {
-  const isfollowing = followed.followers?.includes(followerId);
-  console.log(isfollowing);
+  // Ensure followers and following arrays are initialized
+  const targetUserFollowers = Array.from(new Set(targetUser.followers || []));
+  const currentUserFollowing = Array.from(new Set(currentUser.following?.users || []));
 
-  setFollowedData({
-    ...followed,
-    followers: isfollowing
-      ? followed.followers.filter((user) => { return user != followerId })
-      : [...followed.followers, followerId]
-  });
+  const isFollowing = targetUserFollowers.includes(currentUserId);
 
-  setFollowerData({
-    ...follower,
-    following: {
-      ...follower.following,
-      users: isfollowing
-        ? follower.following.users.filter((user) => { return user != followedId })
-        : [...follower.following.users, followedId]
-    }
-  })
+  // Update target user's followers locally
+  const updatedFollowers = isFollowing
+    ? targetUserFollowers.filter((user) => user !== currentUserId)
+    : [...targetUserFollowers, currentUserId];
 
-  const result = await updateData(
-    "users",
-    followedId,
-    {
-      followers: isfollowing
-        ? followed.followers.filter((user) => { return user != followerId })
-        : [...followed.followers, followerId]
-    }
-  );
+  // Update current user's following locally
+  const updatedFollowing = isFollowing
+    ? currentUserFollowing.filter((user) => user !== targetUserId)
+    : [...currentUserFollowing, targetUserId];
 
-  console.log(result);
+  // Ensure no duplicates in the updated arrays
+  const uniqueUpdatedFollowers = Array.from(new Set(updatedFollowers));
+  const uniqueUpdatedFollowing = Array.from(new Set(updatedFollowing));
 
-  await updateData(
-    "users",
-    followerId,
-    {
+  // Update local state for both users
+  updateFollowers(targetUserId, uniqueUpdatedFollowers);
+  updateFollowing(currentUserId, uniqueUpdatedFollowing);
+
+  try {
+    // Update target user's followers in Firebase
+    await updateData("users", targetUserId, { followers: uniqueUpdatedFollowers });
+
+    // Update current user's following in Firebase
+    await updateData("users", currentUserId, {
       following: {
-        events: follower.following.events,
-        users: isfollowing
-          ? follower.following.users.filter((user) => { return user != followedId })
-          : [...follower.following.users, followedId]
-      }
-    }
-  );
+        ...currentUser.following,
+        users: uniqueUpdatedFollowing,
+      },
+    });
 
-}
+    return true;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

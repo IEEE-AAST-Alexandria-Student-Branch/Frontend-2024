@@ -35,16 +35,16 @@ const formatEventDate = (date: Date, format: string) => {
 const isEventOngoing = (event: EventData) => {
   const today = new Date();
   if (event.endtime && event.starttime && (event.starttime.toDate() < today) && (event.endtime.toDate() > today) && event.registrationOpen && event.formLink && event.formLink.length > 0) {
-    return "Ongoing! Register now!";
+    return "Ongoing! Register now!"; //event is ongoing and registration is open
   }
   if (event.starttime && (event.starttime.toDate() > today) && event.registrationOpen && event.formLink && event.formLink.length > 0) {
-    return "Coming soon! Register now!";
+    return "Coming soon! Register now!"; //event is upcoming and registration is open
   }
   if (event.starttime && (event.starttime.toDate() > today)) {
-    return "Coming soon!";
+    return "Coming soon!"; //event is upcoming
   }
   if (!event.starttime && !event.endtime && event.registrationOpen && event.formLink && event.formLink.length > 0) {
-    return "Registration open!";
+    return "Registration open!"; //event has no start or end time and registration is open
   }
 
   return null;

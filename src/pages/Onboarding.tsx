@@ -34,6 +34,7 @@ export const Onboarding = () => {
       }
     });
   };
+  
 
   const handleUploadAndEditData = async () => {
     const storedFormData = {
