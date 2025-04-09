@@ -15,25 +15,25 @@ export const eventTypesWithColors = [
   { type: "Game", color: "#b83232" },
   { type: "Media", color: "#588CD3" },
   { type: "Mobile", color: "#eb9131" },
-  { type: "Other", color: "#4f3b29" },
   { type: "Python", color: "#e8d36b" },
   { type: "Security", color: "#81AA34" },
   { type: "Technical", color: "#A3A3A3" },
-  { type: "Web", color: "#58D3C0" }
+  { type: "Web", color: "#58D3C0" },
+  { type: "Other", color: "#4f3b29" }
 ];
 
 export const articleTopics = [
-  "Other",
-  "Technical",
   "AI",
-  "Swift",
-  "Python",
-  "Web",
-  "Mobile",
   "Database",
-  "Security",
+  "Game",
   "Media",
-  "Game"
+  "Mobile",
+  "Python",
+  "Security",
+  "Swift",
+  "Technical",
+  "Web",
+  "Other"
 ];
 
 export const roles = [
@@ -87,7 +87,12 @@ export const toggleLike = async (
     setUserData({ ...userData, likes: updatedUserLikes });
 
     // Update user data in Firebase
-    await updateData('users', userId, { likes: updatedUserLikes });
+    await updateData('users', userId, {
+      likes: {
+      articles: type === "article" ? (liked ? arrayRemove(item.id) : arrayUnion(item.id)) : userData.likes.articles,
+      events: type === "article" ? userData.likes.events : (liked ? arrayRemove(item.id) : arrayUnion(item.id)),
+      },
+    });
 
     // Check if item likes exist and update in Firebase
     if (item.likedBy !== undefined) {

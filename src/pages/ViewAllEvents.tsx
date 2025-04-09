@@ -7,8 +7,9 @@ import { SortButton } from "../components/common/SortButton";
 import { LikeButton } from "../components/common/LikeButton";
 import DOMPurify from "dompurify";
 import {Spinner} from "@chakra-ui/react";
+import { eventTypesWithColors } from "../utils";
 
-const topics = ["AI", "Database", "Game", "Media", "Mobile", "Other", "Python", "Security", "Technical", "Web"];
+const topics = eventTypesWithColors.map((event)=>{return event.type})
 
 const formatEventDate = (date: Date, format: string) => {
   if (format === "long") {
