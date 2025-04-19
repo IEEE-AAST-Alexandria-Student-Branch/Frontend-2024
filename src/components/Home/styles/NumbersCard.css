@@ -3,6 +3,7 @@
   grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
   margin: 0 80px 50px;
   gap: 15px;
+  
 }
 
 .box {
@@ -63,6 +64,7 @@
   .box-container {
     margin:1.5rem;
      /* Adjusted margin for better mobile responsiveness */
+     place-items: center; /* Centers the contents of each grid cell */
   }
 
   .box {

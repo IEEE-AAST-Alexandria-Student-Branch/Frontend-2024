@@ -11,6 +11,7 @@ export default interface UserData {
   followers: string[];
   following: following;
   socials?: Social[];
+  verified?: boolean;
 }
 
 interface likes {

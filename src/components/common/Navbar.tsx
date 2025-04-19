@@ -116,10 +116,17 @@ export const NavBar: React.FC = () => {
     t.toLowerCase().includes(searched.toLowerCase())
   ) : null;
 
-  const filterUsers = searched ? users.filter((user) => {
-    const fullName = `${user.userData.firstname}${user.userData.lastname}`.toLowerCase().replace(/\s+/g, '');
-    return fullName.includes(searched.toLowerCase().replace(/\s+/g, ''));
-  }) : null;
+  const filterUsers = searched
+  ? users.filter((user) => {
+      const fullName = `${user.userData.firstname}${user.userData.lastname}`
+        .toLowerCase()
+        .replace(/\s+/g, '');
+      return (
+        user.userData.verified && user.userData.verified === true &&
+        fullName.includes(searched.toLowerCase().replace(/\s+/g, ''))
+      );
+    })
+  : null;
 
   const handleClick = (handled: string) => {
     if (filterArticles?.includes(handled)) {
