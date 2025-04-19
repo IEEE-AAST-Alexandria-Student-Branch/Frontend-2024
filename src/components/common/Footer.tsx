@@ -1,7 +1,8 @@
 import FAQ from "../../assets/faq-bubble-white.png";
 import Linkedin from "../../assets/linkedin-white.png";
 import Contact from "../../assets/contact-envelope-white.png";
-import Logo from "../../assets/IEEEAAST.ico";
+import IEEEOrg from "../../assets/ieeeorg.png";
+import Deanery from "../../assets/aastDeanery.png";
 import FooterSocialCard from "./FooterSocialCard";
 import "./styles/Footer.css";
 import { Element } from 'react-scroll';
@@ -77,7 +78,10 @@ const Footer = () => {
         </div>
         <div className="footer-bottom">
           <a href="https://www.ieee.org/" target="_blank" rel="noreferrer">
-            <img src={Logo} alt="IEEE logo" className="logo-img" />
+            <img src={IEEEOrg} alt="IEEE logo" className="logo-img" />
+          </a>
+          <a href="https://aast.edu/en/student-affairs/alex/index.php" target="_blank" rel="noreferrer">
+            <img src={Deanery} alt="AAST Deanery" className="w-12 ml-2" />
           </a>
         </div>
       </footer>

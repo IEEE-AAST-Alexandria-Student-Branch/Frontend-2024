@@ -117,15 +117,22 @@ export const NavBar: React.FC = () => {
   ) : null;
 
   const filterUsers = searched
-  ? users.filter((user) => {
-      const fullName = `${user.userData.firstname}${user.userData.lastname}`
-        .toLowerCase()
-        .replace(/\s+/g, '');
-      return (
-        user.userData.verified && user.userData.verified === true &&
-        fullName.includes(searched.toLowerCase().replace(/\s+/g, ''))
-      );
-    })
+  ? users
+      .filter((user) => {
+        const fullName = `${user.userData.firstname}${user.userData.lastname}`
+          .toLowerCase()
+          .replace(/\s+/g, '');
+        return (
+          user.userData.verified &&
+          user.userData.verified === true &&
+          fullName.includes(searched.toLowerCase().replace(/\s+/g, ''))
+        );
+      })
+      .sort((a, b) => {
+        const nameA = `${a.userData.firstname} ${a.userData.lastname}`.toLowerCase();
+        const nameB = `${b.userData.firstname} ${b.userData.lastname}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      })
   : null;
 
   const handleClick = (handled: string) => {
