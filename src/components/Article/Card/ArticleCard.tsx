@@ -25,7 +25,7 @@ const ArticleCard = ({ article, author }: ArticleCardProps) => {
           <div className="text-[12px] lg:text-[15px] mb-[20px] lg:mb-[33px] text-[#F4F4F4]">
             {author && (
               <Link className="flex items-center gap-2" to={`/profile/${article.author}`}>
-                <Avatar src={author?.imgurl}></Avatar>
+                <Avatar src={author?.imgurl} name={`${author?.firstname} ${author?.lastname}`}></Avatar>
                 <h5>{author?.firstname || "unknown author"} {author?.lastname || "author"}</h5>
               </Link>
             )}

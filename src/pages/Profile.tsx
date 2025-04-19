@@ -520,6 +520,7 @@ export const Profile = () => {
                             boxShadow="lg"
                             cursor="pointer"
                             mb={8}
+                            name={`${currentUserData.firstname} ${currentUserData.lastname}`}
                           />
                           <Input
                             type="file"
@@ -723,7 +724,7 @@ export const Profile = () => {
                   to={`/profile/${user.id}`}
                   onClick={() => setShowFollowersModal(false)}
                 >
-                  <Avatar size="md" src={user.data.imgurl} />
+                  <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} />
                   <p>{user.data.firstname} {user.data.lastname}</p>
                 </Link>
                 {(id && userId && user.id !== userId) && 
@@ -777,7 +778,7 @@ export const Profile = () => {
                 }
                 }}
                 >
-                <Avatar size="md" src={user.data.imgurl} />
+                <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} />
                 <p>{user.data.firstname} {user.data.lastname}</p>
                 {(id && userId && user.id !== userId) && 
 

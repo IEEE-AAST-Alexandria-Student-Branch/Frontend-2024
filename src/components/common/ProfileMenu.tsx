@@ -13,7 +13,8 @@ const ProfileMenu = () => {
       <MenuButton>
         <Avatar
           size='md'
-          src={userData?.imgurl ? `${userData.imgurl}` : 'src/assets/add-profile-picture-white@2x.png'}
+          src={userData?.imgurl}
+          name={`${userData?.firstname} ${userData?.lastname}`}
         />
       </MenuButton>
       <MenuList bg={'#00091A'} color={'white'} className='text-xl'>
