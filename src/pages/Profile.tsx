@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, FormEvent, useContext, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
+import { AiFillEdit } from "react-icons/ai";
 import {
   Input,
   FormControl,
@@ -23,7 +24,10 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  useDisclosure, // Import Chakra UI's useDisclosure
+  ModalFooter,
+  Button
 } from "@chakra-ui/react";
 import { UserContext } from "../App";
 import getUser from "../firebase/auth";
@@ -61,6 +65,9 @@ interface IdUserData{
 }
 
 export const Profile = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Manage modal state
+  const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null); // State for the selected file
+  const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false); // State for upload status
   const [userEmail, setUserEmail] = useState<string>("");
   const [mobileInvalid, setMobileInvalid] = useState<boolean>(false);
   const [sendEmail, setSendEmail] = useState<boolean>(false);
@@ -77,7 +84,8 @@ export const Profile = () => {
   const [articles, setArticles]= useState<ArticleData[]>();
   const { userData, setUserData, userId } = useContext(UserContext);
   const { name: id } = useParams<{ name: string }>();
-  const mobileRegex = /^\+?[1-9]\d{10,14}$/;
+  const mobileRegex = /^(?:\+([0-9]{1,3}))?[0-9]{10,12}$/;
+  const defaultCover = "https://img.freepik.com/free-vector/abstract-orange-background_698452-2541.jpg"
   const location = useLocation();
   
   const purifyConfig = {
@@ -296,6 +304,36 @@ export const Profile = () => {
     navigate("/");
   };
 
+  const handleCoverPhotoChange = async () => {
+    if (!coverPhotoFile) return;
+
+    setUploadingCoverPhoto(true);
+
+    try {
+      const user = await getUser();
+      const res = await addStorage(coverPhotoFile, `coverphotos/${user.uid}`);
+      if (res.error) {
+        console.error("Error uploading cover photo:", res.error);
+        return;
+      }
+
+      // Update the user's cover photo in the database
+      await updateData("users", user.uid, { coverPhoto: res.link });
+
+      // Update the UI with the new cover photo
+      setSelectedUserData((prev) => ({
+        ...prev!,
+        coverPhoto: res.link,
+      }));
+
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error("Error updating cover photo:", error);
+    } finally {
+      setUploadingCoverPhoto(false);
+    }
+  };
+
   // Determine if Tabs should be displayed
   if(!currentUserData||!selectedUserData) return <Center h={'100vh'}><Spinner size='xl'/></Center>
 
@@ -308,7 +346,57 @@ export const Profile = () => {
         </Alert>
       </Slide>
       <div className="pt-[100px] mx-8 md:mx-32 flex flex-col justify-center">
-        <div className="bg-[url('https://img.freepik.com/free-vector/abstract-orange-background_698452-2541.jpg')] bg-cover bg-center mt-11 h-[100px] md:w-full md:h-[300px] rounded-3xl relative"></div>
+        <div
+          className="bg-cover bg-center mt-11 h-[100px] md:w-full md:h-[300px] rounded-3xl relative flex items-start justify-end p-2"
+          style={{
+            backgroundImage: `url(${selectedUserData?.coverPhoto || defaultCover})`,
+          }}
+        >
+          {self && (
+            <button
+              className="rounded-full p-1 bg-[rgba(0,0,0,0.5)] hover:bg-[rgba(0,0,0,0.7)] transition-opacity duration-300 opacity-80 hover:opacity-100"
+              onClick={onOpen} // Open the modal
+            >
+              <AiFillEdit color="white" size={36} />
+            </button>
+          )}
+        </div>
+
+        {/* Modal for Cover Photo Upload */}
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent backgroundColor={"#151F33"}>
+            <ModalHeader fontSize={"2xl"}>Change Cover Photo</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setCoverPhotoFile(e.target.files ? e.target.files[0] : null)
+                  }
+                />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={handleCoverPhotoChange}
+                isLoading={uploadingCoverPhoto} // Show loading state
+                loadingText="Uploading"
+                disabled={!coverPhotoFile} // Disable button if no file is selected
+              >
+                Upload
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
         <div className=" ml-8 md:ml-16 -mt-14 md:-mt-20 z-0 relative mb-32 md:mb-44">
           {currentUserData.profilePicture ? (
             <img
@@ -649,9 +737,9 @@ export const Profile = () => {
                   setTargetFollowers(setFollowers, userId, updatedFollowers)
                 }
                 setCurrentFollowing={(userId, updatedFollowing) =>
-                  {
-                    userId;
-                    setCurrentFollowing(setUserData, { users: updatedFollowing })}
+                {
+                  userId;
+                  setCurrentFollowing(setUserData, { users: updatedFollowing })}
                 }
                 className="follow-button ml-auto"
                 />

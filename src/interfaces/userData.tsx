@@ -12,6 +12,7 @@ export default interface UserData {
   following: following;
   socials?: Social[];
   verified?: boolean;
+  coverPhoto?: string;
 }
 
 interface likes {

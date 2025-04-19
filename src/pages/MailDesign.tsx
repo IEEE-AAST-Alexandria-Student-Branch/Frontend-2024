@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import getUser from "../firebase/auth";
 import getDocument from "../firebase/getData";
 import { Spinner } from "@chakra-ui/react";
+import Triangle from "../assets/bg-triangle-ellipse@2x.png";
+import LinkedIn from "../assets/linkedin-white.png";
 
 export const MailDesign = () => {
 
@@ -48,9 +50,9 @@ export const MailDesign = () => {
         <footer className="flex justify-between">
           <p className="footer_text">® IEEE AAST ALEX SB</p>
           <a href="https:www.linkedin.com/company/ieeeaast/">
-            <img src="\src\assets\linkedin-white.png" id="linkedin" />
+            <img src={LinkedIn} id="linkedin" />
           </a>
-          <img src="\src\assets\twitter-white.png" id="twitter" />
+          <img src={Triangle} id="twitter" />
         </footer>
       </div>
     </div>

@@ -74,8 +74,7 @@ export const HomeComp = () => {
                                 </button>
                             </div>
                             <div className="mt-4 text-sm font-normal">
-                                <p>Enter your email and become a member.</p>
-                                <p>No Credit Card Needed.</p>
+                                <p>Enter your email and become a member today.</p>
                             </div>
                         </>
                     )}

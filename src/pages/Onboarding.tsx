@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   Spinner,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import addStorage from "../firebase/addStorage.js";
 import getUser from "../firebase/auth.js";
@@ -24,6 +25,7 @@ export const Onboarding = () => {
   });
   const [userData, setUserData] = useState<any>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobileInvalid, setIsMobileInvalid] = useState(false);
 
   const fetchUser = async () => {
     const user = await getUser();
@@ -34,21 +36,30 @@ export const Onboarding = () => {
       }
     });
   };
-  
 
   const handleUploadAndEditData = async () => {
     const storedFormData = {
       mobile: formData.mobile,
       imgurl: "",
     };
+
     const user = await getUser();
-    await addStorage(formData.profilePicture, `profilepics/${user.uid}`).then(
-      (res) => {
-        storedFormData.imgurl = res.link;
-      }
-    );
+
+    // Only upload the profile picture if it is selected
+    if (formData.profilePicture) {
+      await addStorage(formData.profilePicture, `profilepics/${user.uid}`).then(
+        (res) => {
+          if (res.error) {
+            console.error("Error uploading file:", res.error);
+            return;
+          }
+          storedFormData.imgurl = res.link;
+        }
+      );
+    }
+
     await updateData("users", user.uid, storedFormData);
-    navigate("/")
+    navigate("/");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +70,12 @@ export const Onboarding = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Validate mobile number
+    if (name === "mobile") {
+      const mobileRegex = /^(?:\+([0-9]{1,3}))?[0-9]{10,12}$/;
+      setIsMobileInvalid(!mobileRegex.test(value));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -120,7 +137,7 @@ export const Onboarding = () => {
               />
             </label>
             <form onSubmit={handleSubmit}>
-              <FormControl className="pt-4">
+              <FormControl className="pt-4" isInvalid={isMobileInvalid}>
                 <FormLabel>Mobile Number</FormLabel>
                 <Input
                   type="tel"
@@ -130,6 +147,11 @@ export const Onboarding = () => {
                   onChange={handleChange}
                   required
                 />
+                {isMobileInvalid && (
+                  <FormErrorMessage>
+                    Please enter a valid mobile number (e.g., +123456789012).
+                  </FormErrorMessage>
+                )}
               </FormControl>
             </form>
             <div className="pt-8">
@@ -141,6 +163,7 @@ export const Onboarding = () => {
               <button
                 className="bg-white text-black text-sm font-bold py-2 px-8 w-36 border-2 border-white rounded-full m-2"
                 onClick={handleUploadAndEditData}
+                disabled={isMobileInvalid}
               >
                 Finish
               </button>

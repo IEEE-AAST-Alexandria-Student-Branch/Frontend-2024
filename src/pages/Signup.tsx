@@ -40,6 +40,12 @@ export const SignUp = () => {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
+
+    // Limit firstName and lastName to 15 characters
+    if ((id === "firstName" || id === "lastName") && value.length > 15) {
+      return; // Prevent further input if the limit is exceeded
+    }
+
     setFormData({
       ...formData,
       [id]: value,
@@ -118,6 +124,7 @@ export const SignUp = () => {
                   onChange={handleChange}
                   required
                   placeholder="First name"
+                  maxLength={15} // Optional: Add maxLength for additional browser-level enforcement
                   style={{
                     width: "80%",
                     border: "none",
@@ -136,6 +143,7 @@ export const SignUp = () => {
                   onChange={handleChange}
                   required
                   placeholder="Last name"
+                  maxLength={15} // Optional: Add maxLength for additional browser-level enforcement
                   style={{
                     width: "80%",
                     border: "none",
