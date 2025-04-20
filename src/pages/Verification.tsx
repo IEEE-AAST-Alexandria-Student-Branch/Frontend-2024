@@ -16,7 +16,7 @@ export const Verifying = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         if (user.emailVerified) {
-          navigate("/mailconfirm"); // Redirect to "/mail2" route
+          navigate("/");
         } else {
           sendVerifyEmail();
           isLoading(false);

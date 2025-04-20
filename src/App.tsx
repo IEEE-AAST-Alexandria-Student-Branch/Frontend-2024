@@ -7,7 +7,6 @@ import { Article } from "./pages/Article";
 import "./App.css"; // Import CSS file
 import { Spinner } from '@chakra-ui/react'
 import getDocument from "./firebase/getData"
-import { MailDesign } from "./pages/MailDesign";
 import { Onboarding } from "./pages/Onboarding";
 import { Verifying } from "./pages/Verification";
 import { SignUp } from "./pages/Signup";
@@ -120,7 +119,6 @@ function App() {
           <Route path="/event/:name" element={<EventDetails />} />
           <Route path="/article/:name" element={<Article />} />
           <Route path="/write" element={<WriteArticle />} />
-          <Route path="/mailconfirm" element={<MailDesign />} />
           <Route path="/onboard" element={<Onboarding />} />
           <Route path="/verify" element={<Verifying />} />
           <Route path="/Signup" element={<SignUp />} />
