@@ -49,7 +49,6 @@ import { FollowButton } from "../components/common/FollowButton.tsx";
 import { HoverIcon } from "../components/common/HoverIcon.tsx";
 import IEEELogoSmall from "../assets/ieeesmall.png";
 import Admin from "../assets/admin.png";
-import { get } from "http";
 
 interface currentUserData {
   mobile: string|null;
