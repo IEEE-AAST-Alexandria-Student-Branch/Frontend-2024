@@ -6,6 +6,7 @@ import Triangle from "../assets/bg-triangle-ellipse@2x.png"
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button } from "@chakra-ui/react";
 import getUser from "../firebase/auth";
 import sendPasswordEmail from "../firebase/sendPasswordResetEmail";
+import {handleGoogleSignIn} from "../utils"
 
 interface FormData {
   firstName: string;
@@ -13,6 +14,7 @@ interface FormData {
   email: string;
   password: string;
 }
+
 
 export const Signin = () => {
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ export const Signin = () => {
   const [showSentEmail, setShowSentEmail] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const onClose = () => setIsOpen(false);
+
   const fetchCurrentUserEmail = async () => {
     try {
       const user = await getUser();
@@ -73,7 +76,15 @@ export const Signin = () => {
     }
     )
   };
-
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await getUser();
+      if (user) {
+        navigate("/");
+      }
+    };
+    checkUser();
+  }, []);
   return (
     <div className="min-h-fit">
         <Slide direction="top" in={showSentEmail} style={{ zIndex: 300 }}>
@@ -128,6 +139,7 @@ export const Signin = () => {
                   }}
                 />
                 <span className="px-4 text-blue-500 cursor-pointer w-44" onClick={()=>setIsOpen(true)}>Forgot password?</span>
+                <Link to="/Signup" className="text-blue-500 px-4 mt-4">Don't have an account yet? Sign up!</Link>
                 </div>
 
                 {showError && (
@@ -136,10 +148,11 @@ export const Signin = () => {
                   </FormErrorMessage>
                 )}
               </FormControl>
-
+                <div></div>
+                
               {/* //button divs */}
               <div className="flex flex-nowrap">
-                <div className="pt-8 flex flex-nowrap items-center gap-4 flex-col">
+                <div className="flex flex-nowrap items-center gap-4 flex-col">
                   <div className="flex flex-col sm:flex-row items-center gap-2">
                     <button type="submit" className="defaultButton" style={{
                       fontSize: '11px',
@@ -161,7 +174,22 @@ export const Signin = () => {
                       Cancel
                     </button>
                   </div>
-                  <Link to="/Signup" className="text-blue-500">Don't have an account yet? Sign up!</Link>
+                  <button
+                  className="flex items-center gap-2 bg-white text-black font-medium px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-shadow self-start"
+                  onClick={() => {
+                    handleGoogleSignIn();
+                    console.log("Google Sign-In clicked");
+                  }}
+                  type="button"
+                >
+                  <img
+                    src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+                    alt="Google Logo"
+                    className="w-10 h-10"
+                  />
+                  Sign in with Google
+                </button>
+                  
                 </div>
               </div>
             </form>

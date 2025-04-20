@@ -4,6 +4,8 @@ import { Input, FormControl, FormErrorMessage, List, ListItem } from "@chakra-ui
 import setData from "../firebase/setData";
 import register from "../firebase/register";
 import Triangle from "../assets/bg-triangle-ellipse@2x.png";
+import { handleGoogleSignIn } from "../utils";
+import getUser from "../firebase/auth";
 
 interface FormData {
   firstName: string;
@@ -13,6 +15,15 @@ interface FormData {
 }
 
 export const SignUp = () => {
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await getUser();
+      if (user) {
+        navigate("/");
+      }
+    };
+    checkUser();
+  }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
@@ -212,8 +223,11 @@ export const SignUp = () => {
                   </FormErrorMessage>
                 )}
               </FormControl>
-
+              <Link to="/signin" className="text-blue-500 px-4 mt-4">
+                    Already have an account? Sign in!
+                  </Link>
               <div className="flex flex-nowrap">
+                
                 <div className="pt-8 flex flex-nowrap items-center gap-2 flex-col">
                   <div className="flex flex-col sm:flex-row items-center gap-2">
 
@@ -245,9 +259,22 @@ export const SignUp = () => {
                       </button>
                     </Link>
                   </div>
-                  <Link to="/signin" className="text-blue-500">
-                    Already have an account? Sign in!
-                  </Link>
+                  <button
+                className="flex items-center gap-2 bg-white text-black font-medium px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-shadow self-start mt-2"
+                onClick={() => {
+                  handleGoogleSignIn();
+                  console.log("Google Sign-In clicked");
+                }}
+                type="button"
+              >
+                <img
+                  src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+                  alt="Google Logo"
+                  className="w-10 h-10"
+                />
+                Sign in with Google
+              </button>
+                  
                 </div>
               </div>
             </form>

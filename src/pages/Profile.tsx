@@ -38,6 +38,7 @@ import getDocumentsById from "../firebase/getDocumentsById";
 import sendPasswordEmail from "../firebase/sendPasswordResetEmail.js";
 import ArticleCard from "../components/Article/Card/ArticleCard.tsx"
 import subscribeToCollection from "../firebase/subscribeToCollection.js";
+import {getUserAuthMethods} from "../firebase/getUserAuthMethods.js"
 import ArticleData from "../interfaces/ArticleData.tsx";
 import { convertNewLinesToBRTags, convertBRTagsToNewLines } from "../utils.ts";
 import UserData from "../interfaces/userData.tsx";
@@ -48,8 +49,7 @@ import { FollowButton } from "../components/common/FollowButton.tsx";
 import { HoverIcon } from "../components/common/HoverIcon.tsx";
 import IEEELogoSmall from "../assets/ieeesmall.png";
 import Admin from "../assets/admin.png";
-
-const defaultAvatar = <svg viewBox="0 0 128 128" className="w-full h-full bg-[#A0AEC0] rounded-full" role="img" aria-label=" avatar"><path fill="currentColor" d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.768 25,101.7892 L25,95.2 C25,86.8096 31.981,80 40.6,80 L87.4,80 C96.019,80 103,86.8096 103,95.2 L103,102.1388 Z"></path><path fill="currentColor" d="M63.9961647,24 C51.2938136,24 41,34.2938136 41,46.9961647 C41,59.7061864 51.2938136,70 63.9961647,70 C76.6985159,70 87,59.7061864 87,46.9961647 C87,34.2938136 76.6985159,24 63.9961647,24"></path></svg>;
+import { get } from "http";
 
 interface currentUserData {
   mobile: string|null;
@@ -76,6 +76,7 @@ export const Profile = () => {
   const [selectedUserData, setSelectedUserData]= useState<UserData>();
   const [showFollowersModal, setShowFollowersModal] = useState<boolean>(false);
   const [showFollowingModal, setShowFollowingModal] = useState<boolean>(false);
+  const [authMethods, setAuthMethods] = useState<any>(null);
   const navigate = useNavigate();
 
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -161,6 +162,13 @@ export const Profile = () => {
       return null;
     }
   };
+
+  useEffect(()=>{
+    const auths=getUserAuthMethods()
+    console.log(auths);
+    setAuthMethods(getUserAuthMethods())
+  },[])
+
   // Fetch user data and check if the `id` matches the logged-in user ID
   useEffect(() => {
     const fetchData = async () => {
@@ -397,32 +405,23 @@ export const Profile = () => {
           </ModalContent>
         </Modal>
 
-        <div className=" ml-8 md:ml-16 -mt-14 md:-mt-20 z-0 relative mb-32 md:mb-44">
-          {currentUserData.profilePicture ? (
-            <img
-              className="absolute z-10 w-24 h-24 md:w-40 md:h-40 rounded-full object-cover mb-7"
-              src={
-          typeof currentUserData.profilePicture === "string"
-            ? `${currentUserData.profilePicture}`
-            : URL.createObjectURL(currentUserData.profilePicture)
-              }
-              alt="Profile"
+        <div className=" ml-8 md:ml-16 -mt-14 md:-mt-20 z-0 relative">
+            <Avatar
+              className="absolute z-10 w-24 h-24 md:w-40 md:h-40 rounded-full object-cover mb-4"
+              src={typeof currentUserData?.profilePicture === "string" ? currentUserData.profilePicture : undefined}
+              name={`${currentUserData.firstname} ${currentUserData.lastname}`}
+              size={"2xl"}
             />
-          ) : (
-            <div className="absolute z-10 w-24 h-24 md:w-40 md:h-40 rounded-full mb-7">
-              {defaultAvatar}
-            </div>
-          )}
         </div>
         <Tabs size='sm' variant={'unstyled'}>
           <div className="flex  justify-between items-center flex-wrap">
             
             <div className="flex flex-col">
-              <div className="flex gap-2 items-center"><p className="text-2xl font-extrabold font-textmedium md:ml-16"> {currentUserData.firstname} {currentUserData.lastname}</p>
+              <div className="flex gap-2 items-center"><p className="text-2xl font-extrabold font-textmedium md:ml-4"> {currentUserData.firstname} {currentUserData.lastname}</p>
               {selectedUserData.roles?.includes("admin") && <HoverIcon src={Admin} alt="Site Admin" hoverText="This user is a website admin!" />}
               {selectedUserData.roles?.includes("volunteer") && <HoverIcon src={IEEELogoSmall} alt="Site Admin" hoverText="This user is an IEEE AAST volunteer!"/>}
               </div>
-              <div className="flex gap-[10px] items-center font-extralight md:ml-16 mb-7 md:mb-0">
+              <div className="flex gap-[10px] items-center font-extralight md:ml-4 mb-7 md:mb-0">
               <Text className="text-sm cursor-pointer" onClick={async () => {
                 if (selectedUserData.followers.length > 0) {
                   const users = await getUsers(selectedUserData?.followers);
@@ -448,7 +447,7 @@ export const Profile = () => {
                 </div>
               </div>
               </div>
-              <TabList>
+              <TabList className="mx-auto sm:mx-0">
                 <Tab>About</Tab>
                 <Tab>Articles</Tab>
                 {/*<Tab>Contributions</Tab> disabled for now*/ }
@@ -624,11 +623,11 @@ export const Profile = () => {
                             {errorMessage}
                           </FormErrorMessage>
                         </FormControl>
-                        <Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Change Password: </Text>
+                        {!(authMethods.length === 1 && authMethods.includes("google.com")) && <><Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Change Password: </Text>
                         <FormControl mb={4}>
                           <button
-                            className="defaultButton"
-                            type="button"
+                          className="defaultButton"
+                          type="button"
                             style={{
                               fontSize: '16px',
                               fontFamily: 'SF-Pro-Display-Bold',
@@ -653,7 +652,7 @@ export const Profile = () => {
                           >
                             Change Password
                           </button>
-                        </FormControl>
+                        </FormControl></>}
 
                       <div className="flex flex-nowrap">
                         <div className="pt-8 flex flex-nowrap items-center gap-4 flex-col">

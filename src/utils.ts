@@ -5,6 +5,9 @@ import { ensureUserFieldExist } from './firebase/addBookMarksMissingFields';
 import ArticleData from './interfaces/ArticleData';
 import { EventData } from './interfaces/EventData';
 import userData from './interfaces/userData';
+import signInWithGoogle from './firebase/signInWithGoogle';
+import { docExists } from './firebase/docExists';
+import setData from './firebase/setData';
 
 export const eventTypesWithColors = [
   { type: "AI", color: "#C058D3" },
@@ -201,4 +204,36 @@ export const toggleFollow = async (
     console.error(error);
     return null;
   }
+};
+
+export const handleGoogleSignIn = async () => {
+  const { result, error } = await signInWithGoogle();
+  
+
+  if (error) {
+    console.error(error);
+    alert(error);
+  } else {
+    const storedEmptyUser = {
+      firstname: result?.user?.displayName?.split(" ")[0] || "",
+      lastname: result?.user?.displayName?.split(" ").slice(1).join(" ") || "",
+      desc: "",
+      email: result?.user?.email || "",
+      likes: { events: [], articles: [] },
+      followers: [],
+      roles: [],
+      following: { events: [], users: [] }
+    };
+    if (result?.user?.uid) {
+      const userExists = await docExists("users", result.user.uid);
+      if (!userExists) {
+        await setData("users", storedEmptyUser, result.user.uid);
+        
+      }
+      window.location.reload();
+    }
+
+  }
+
+  
 };
