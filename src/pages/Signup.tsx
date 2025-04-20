@@ -89,7 +89,7 @@ export const SignUp = () => {
   const hasLowercase = /[a-z]/.test(formData.password);
   const hasUppercase = /[A-Z]/.test(formData.password);
   const hasDigit = /\d/.test(formData.password);
-  const hasSpecialChar = /[@$!%*?&]/.test(formData.password);
+  const hasSpecialChar = /[@$!%*?&#;]/.test(formData.password);
 
   // Determine if the password is invalid
   const isErrorPass = !minLength || !hasLowercase || !hasUppercase || !hasDigit || !hasSpecialChar;
@@ -205,7 +205,7 @@ export const SignUp = () => {
                       {!hasDigit && <ListItem>Password must contain at least one digit.</ListItem>}
                       {!hasSpecialChar && (
                         <ListItem>
-                          Password must contain at least one special character (e.g., !@#$%^&*).
+                          Password must contain at least one special character (e.g., !@#$%^&*;).
                         </ListItem>
                       )}
                     </List>
