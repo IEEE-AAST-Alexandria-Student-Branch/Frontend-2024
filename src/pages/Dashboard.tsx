@@ -96,65 +96,51 @@ export const Dashboard = () => {
 
   return (
     <div className="flex flex-col items-center bg-[#000B21] text-white header pt-28">
-      {/* <div className="h-[120px] w-full"></div> */}
+      {/* Hero Section */}
       {<div className="w-full flex justify-center items-center px-4 mt-0 lg:mt-0 md:px-20 body">
         <div className="relative w-full lg:w-[1733px] h-[300px] md:h-[450px] lg:h-[600px] rounded-[38px] overflow-hidden">
           <div className="absolute z-10 w-full h-full bg-gradient-to-t from-[#000B21A5] via-transparent bottom-0"></div>
-          {(loadingArticles||loadingEvents) ? <div className="flex h-full w-full items-center justify-center"><Spinner size="xl" /></div>
-          :
-          <>
-          {filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? (
-        <div className="absolute bottom-[83px] z-10 left-[35px] text-white">
-          <h2 className="text-[24px] lg:text-[50px] font-serif font-black">{filterArticles[0]?.title || "no title"}</h2>
-          <h3 className="text-[14px] lg:text-[24px]">Article • {filterArticles[0]?.topic} • {authors[filterArticles[0]?.author]?.firstname || "unknown author"}</h3>
-          <button className="w-[100px] lg:w-[169px] h-[40px] lg:h-[59px] text-[14px] lg:text-[21px] bg-white text-black font-bold rounded-[20px] lg:rounded-[29px] mt-[20px] lg:mt-[45px]"
-            onClick={() => navigate(`/article/${filterArticles[0]?.title}`)}>
-            View
-          </button>
-        </div>
+          {(loadingArticles || loadingEvents) ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <Spinner size="xl" />
+            </div>
           ) : (
-        <div className="absolute bottom-[83px] z-10 left-[35px] text-white">
-          <h2 className="text-[24px] lg:text-[50px] font-serif font-black">{filterEvents[0]?.title || "no title"}</h2>
-          <h3 className="text-[14px] lg:text-[24px]">Event • {filterEvents[0]?.type} • {filterEvents[0]?.starttime ? filterEvents[0].starttime.toDate().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : "Date TBA"}</h3>
-          <button className="w-[100px] lg:w-[169px] h-[40px] lg:h-[59px] text-[14px] lg:text-[21px] bg-white text-black font-bold rounded-[20px] lg:rounded-[29px] mt-[20px] lg:mt-[45px]"
-            onClick={() => navigate(`/event/${filterEvents[0]?.title}`)}>
-            View
-          </button>
-        </div>
+            <>
+              {filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? (
+                <div className="absolute bottom-[83px] z-10 left-[35px] text-white">
+                  <h2 className="text-[24px] lg:text-[50px] font-serif font-black">{filterArticles[0]?.title || "no title"}</h2>
+                  <h3 className="text-[14px] lg:text-[24px]">Article • {filterArticles[0]?.topic} • {authors[filterArticles[0]?.author]?.firstname || "unknown author"}</h3>
+                  <button className="w-[100px] lg:w-[169px] h-[40px] lg:h-[59px] text-[14px] lg:text-[21px] bg-white text-black font-bold rounded-[20px] lg:rounded-[29px] mt-[20px] lg:mt-[45px]"
+                    onClick={() => navigate(`/article/${filterArticles[0]?.title}`)}>
+                    View
+                  </button>
+                </div>
+              ) : (
+                <div className="absolute bottom-[83px] z-10 left-[35px] text-white">
+                  <h2 className="text-[24px] lg:text-[50px] font-serif font-black">{filterEvents[0]?.title || "no title"}</h2>
+                  <h3 className="text-[14px] lg:text-[24px]">Event • {filterEvents[0]?.type} • {filterEvents[0]?.starttime ? filterEvents[0].starttime.toDate().toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : "Date TBA"}</h3>
+                  <button className="w-[100px] lg:w-[169px] h-[40px] lg:h-[59px] text-[14px] lg:text-[21px] bg-white text-black font-bold rounded-[20px] lg:rounded-[29px] mt-[20px] lg:mt-[45px]"
+                    onClick={() => navigate(`/event/${filterEvents[0]?.title}`)}>
+                    View
+                  </button>
+                </div>
+              )}
+              <img
+                className="absolute inset-0 w-full h-full object-cover filter blur-lg"
+                src={filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? filterArticles[0]?.image : filterEvents[0]?.coverPhoto}
+                alt="Background Blurred"
+              />
+              <img
+                className="relative object-contain w-full h-full"
+                src={filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? filterArticles[0]?.image : filterEvents[0]?.coverPhoto}
+                alt="Main Display"
+              />
+            </>
           )}
-          <img
-        className="absolute inset-0 w-full h-full object-cover filter blur-lg"
-        src={filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? filterArticles[0]?.image : filterEvents[0]?.coverPhoto}
-        alt="Background Blurred"
-          />
-          <img
-        className="relative object-contain w-full h-full"
-        src={filterArticles[0] && (!filterEvents[0] || !filterEvents[0].starttime || filterArticles[0].publishdate.toDate().getTime() > filterEvents[0].starttime?.toDate().getTime()) ? filterArticles[0]?.image : filterEvents[0]?.coverPhoto}
-        alt="Main Display"
-          />
-          </>
-          }
         </div>
       </div>}
 
-      <div className="mt-[50px] w-full px-4 lg:px-[89px]">
-        <div className="flex justify-between items-center">
-          <h2 className="text-white text-[24px] lg:text-[45px] font-bold">Latest Articles</h2>
-          <Link to="/articles">
-            <button className="flex items-center text-[16px] lg:text-[30px] text-white">
-              View all
-              <img className="ml-[8px]" src={arrowRightIcon} width={24} alt="arrow right" />
-            </button>
-          </Link>
-        </div>
-        <div className="mt-[30px] lg:mt-[59px] flex flex-col gap-[30px] lg:gap-[58px]">
-          {loadingArticles ?<div className="w-full flex items-center justify-center"> <Spinner size="xl" /></div> :
-          filterArticles.map((article, index) => {
-            return <ArticleCard article={article} author={authors[article.author]} key={index} />;
-          })}
-        </div>
-      </div>
-
+      {/* Events Section */}
       <div className="mt-[50px] lg:mt-[100px] w-full px-4 lg:px-[89px]">
         <div className="flex justify-between items-center">
           <h2 className="text-white text-[24px] lg:text-[45px] font-bold">Events</h2>
@@ -167,15 +153,32 @@ export const Dashboard = () => {
         </div>
         <div className="mt-[30px] lg:mt-[59px]">
           <div className="flex gap-[20px]">
+            <div className="flex flex-col sm:flex sm:flex-row overflow-y-visible gap-[5px] md:gap-[10px] justify-around w-full">
+              {loadingEvents ? <Spinner size="xl" />
+                : filterEvents.map((event) => (
+                  <EventCard event={event} />
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div className="flex flex-col sm:flex sm:flex-row overflow-y-hidden gap-[5px] md:gap-[10px] mb-16 justify-around w-full py-10">
-            {loadingEvents? <Spinner size="xl" />
-            :filterEvents.map((event)=>(
-              <EventCard event={event}/>
-            ))}
-          </div>
-            
-          </div>
+      {/* Articles Section */}
+      <div className="mt-[50px] w-full px-4 lg:px-[89px] pb-10">
+        <div className="flex justify-between items-center">
+          <h2 className="text-white text-[24px] lg:text-[45px] font-bold">Latest Articles</h2>
+          <Link to="/articles">
+            <button className="flex items-center text-[16px] lg:text-[30px] text-white">
+              View all
+              <img className="ml-[8px]" src={arrowRightIcon} width={24} alt="arrow right" />
+            </button>
+          </Link>
+        </div>
+        <div className="mt-[30px] lg:mt-[59px] flex flex-col gap-[30px] lg:gap-[58px]">
+          {loadingArticles ? <div className="w-full flex items-center justify-center"> <Spinner size="xl" /></div> :
+            filterArticles.map((article, index) => {
+              return <ArticleCard article={article} author={authors[article.author]} key={index} />;
+            })}
         </div>
       </div>
     </div>
