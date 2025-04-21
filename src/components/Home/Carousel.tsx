@@ -52,10 +52,18 @@ export const SwipeCarousel = () => {
       >
         {awards.map((award, idx) => (
           <SwiperSlide key={idx}>
-            <div className="relative w-full h-full flex flex-col items-center justify-center p-8 bg-white border-2 border-purple-400 rounded-lg swirly-background">
-              <div className="text-[20px] font-semibold text-center text-black mt-4  xl:w-[350px] min-h-[60px]">
+            <div className="text-center relative w-full h-full flex flex-col justify-between items-center pt-4 bg-white border-2 border-purple-400 rounded-lg swirly-background cursor-pointer">
+            <p className="text-[#5D17EB] font-bold text-xl">{award.description}</p>
+            
+                <div
+                className={`${
+                  award.name.length > 45 ? "text-[18px]" : "text-[20px] mt-4"
+                } font-semibold text-center text-black  xl:w-[350px] h-fit`}
+                >
                 {award.name}
-              </div>
+                </div>
+                {award.winner&&<p className="text-[#5D17EB] font-bold text-xl">{award.winner}</p>}
+
               <div className="xl:w-48 xl:h-48 md:w-40 md:h-40 h-48 w-48 flex items-center justify-center mt-14 mb-8">
                 <img
                   src={Trophy}
