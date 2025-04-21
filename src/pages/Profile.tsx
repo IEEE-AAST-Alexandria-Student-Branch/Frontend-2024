@@ -403,7 +403,7 @@ export const Profile = () => {
           )}
         </div>
 
-        {/* Modal for Cover Photo Upload */}
+        {self&&
         <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
@@ -478,7 +478,7 @@ export const Profile = () => {
               </Button>
             </ModalFooter>
           </ModalContent>
-        </Modal>
+        </Modal>}
         <div className="md:ml-16 -mt-14 md:-mt-20 z-0 relative group w-24 h-24 md:w-40 md:h-40">
           <Avatar
             className={`absolute z-10 w-full h-full rounded-full object-cover mb-4 transition-transform duration-300 ${self&&"group-hover:scale-110"}`}
@@ -498,7 +498,7 @@ export const Profile = () => {
           <p className="font-bold select-none text-xs md:text-base">EDIT</p>
             </div>
           )}
-        </div>
+        </div>{self &&
         <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
@@ -577,7 +577,7 @@ export const Profile = () => {
               </Button>
             </ModalFooter>
           </ModalContent>
-        </Modal>
+        </Modal>}
 
         <Tabs size='sm' variant={'unstyled'}>
           <div className="flex  justify-between items-center flex-wrap">
