@@ -25,6 +25,9 @@ const isEventOngoing = (event: EventData) => {
     return "ONGOING!"; //event is ongoing and registration is open
   }
   if (event.starttime && (event.starttime.toDate() > today)) {
+    if(event.registrationOpen && event.formLink && event.formLink.length > 0) {
+      return "REGISTER NOW!"; //event is upcoming and registration is open
+    }
     return "COMING SOON!"; //event is upcoming
   }
 
