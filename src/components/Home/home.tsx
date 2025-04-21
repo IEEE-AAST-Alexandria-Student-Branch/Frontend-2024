@@ -105,7 +105,7 @@ export const HomeComp = () => {
                             </div>
                         </>
                     )}
-                    <RecruitmentCard />
+                    <RecruitmentCard className={`transition-opacity ${hideNavBar&&"opacity-0"}`} />
                 </div>
             </div>
 
