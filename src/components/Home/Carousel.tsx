@@ -26,7 +26,7 @@ export const SwipeCarousel = () => {
     getCollection("awards").then((response) => {
       if (response.result) {
         const sortedAwards = response.result.sort(
-          (a: Award, b: Award) => a.year - b.year
+          (a: Award, b: Award) => b.year - a.year
         );
         setAwards(sortedAwards);
       }
