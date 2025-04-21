@@ -15,6 +15,7 @@ const ProfileMenu = () => {
           size='md'
           src={userData?.imgurl}
           name={`${userData?.firstname} ${userData?.lastname}`}
+          key={`${userData?.firstname} ${userData?.lastname}`}
         />
       </MenuButton>
       <MenuList bg={'#00091A'} color={'white'} className='text-xl'>

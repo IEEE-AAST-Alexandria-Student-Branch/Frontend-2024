@@ -170,7 +170,7 @@ export const Admin = () => {
                 <div className='w-1/5 text-ellipsis flex flex-col min-w-48 bg-[#000b21] overflow-y-auto max-h-[63vh] overflow-x-hidden customScrollbar gap-1 border-4 border-[#000b21]'>
                   {users.map(user => (
                     <div key={user.id} className={`flex items-center min-w-48 p-2 gap-2 ${selectedUser === user ? "bg-[#516182]" : "bg-[#0b162a]"} rounded-md cursor-pointer mr-2`} onClick={() => setSelectedUser(user)}>
-                      <Avatar name={`${user.firstname} ${user.lastname}`} src={user.imgurl} />
+                      <Avatar name={`${user.firstname} ${user.lastname}`} src={user.imgurl} key={`${user.firstname} ${user.lastname}`} />
                       <p>{user.firstname} {user.lastname}</p>
                       {user.id !== userId && (
                         <LightMode>

@@ -275,7 +275,7 @@ export const NavBar: React.FC<NavBarProps> = ({ hideNavBar }) => {
                   {filterUsers?.length == 0 && searched.length > 0 && <div className="result">No users found</div>}
                   {filterUsers?.map((u, index) => (
                     <Link key={index} to={`profile/${u.id}`} onClick={()=>{setShowSearch(false)}} className="result flex gap-2 items-center">
-                      <Avatar src={u.userData?.imgurl} name={`${u.userData.firstname} ${u.userData.lastname}`} />
+                      <Avatar src={u.userData?.imgurl} name={`${u.userData.firstname} ${u.userData.lastname}`} key={`${u.userData.firstname} ${u.userData.lastname}`} />
                       {u.userData?.firstname ? `${u.userData?.firstname} ${u.userData?.lastname}`: "Unknown User"}
                     </Link>
                   ))}
@@ -479,7 +479,7 @@ export const NavBar: React.FC<NavBarProps> = ({ hideNavBar }) => {
                       {filterUsers?.length == 0 && searched.length > 0 && <div className="result">No users found</div>}
                       {filterUsers?.map((u, index) => (
                         <Link key={index} to={`profile/${u.id}`} onClick={()=>{setShowSearch(false)}} className="result flex gap-2 items-center">
-                          <Avatar src={u.userData?.imgurl} name={`${u.userData.firstname} ${u.userData.lastname}`} />
+                          <Avatar src={u.userData?.imgurl} name={`${u.userData.firstname} ${u.userData.lastname}`} key={`${u.userData.firstname} ${u.userData.lastname}`} />
                           {u.userData?.firstname ? `${u.userData?.firstname} ${u.userData?.lastname}`: "Unknown User"}
                         </Link>
                       ))}

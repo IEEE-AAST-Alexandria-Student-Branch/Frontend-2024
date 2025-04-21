@@ -489,6 +489,7 @@ export const Profile = () => {
           : selectedUserData?.imgurl || undefined
             }
             name={`${currentUserData.firstname} ${currentUserData.lastname}`}
+            key={`${currentUserData.firstname} ${currentUserData.lastname}`}
             size={{ md: "2xl", base: "xl" }}
           />
           {self && (
@@ -862,7 +863,7 @@ export const Profile = () => {
                   to={`/profile/${user.id}`}
                   onClick={() => setShowFollowersModal(false)}
                 >
-                  <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} />
+                  <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} key={`${user.data.firstname} ${user.data.lastname}`} />
                   <p>{user.data.firstname} {user.data.lastname}</p>
                 </Link>
                 {(id && userId && user.id !== userId) && 
@@ -916,7 +917,7 @@ export const Profile = () => {
                 }
                 }}
                 >
-                <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} />
+                <Avatar size="md" src={user.data.imgurl} name={`${user.data.firstname} ${user.data.lastname}`} key={`${user.data.firstname} ${user.data.lastname}`} />
                 <p>{user.data.firstname} {user.data.lastname}</p>
                 {(id && userId && user.id !== userId) && 
 

@@ -13,7 +13,7 @@ export const Speaker = ({ name, src, bio, links }: {name: string, src:string, bi
       <Tr>
         <Td>
           <Stack direction={'row'} alignItems="center">
-            <Avatar name={name} src={src}/>
+            <Avatar name={name} src={src} key={name}/>
             {/* < CustomAvatar name={name} bio={bio} src={src} Slinks={{ twitter: 'twitter.com', instagram: '', linkedin: '' }} /> */}
           </Stack>
         </Td>

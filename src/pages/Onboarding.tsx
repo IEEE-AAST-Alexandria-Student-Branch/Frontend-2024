@@ -119,13 +119,14 @@ export const Onboarding = () => {
               <Avatar
                 size="md"
                 src={
-                  formData.profilePicture
-                    ? URL.createObjectURL(formData.profilePicture)
-                    : "src/assets/add-profile-picture-white@2x.png"
+                  formData.profilePicture ? URL.createObjectURL(formData.profilePicture) : ""
                 }
+                name={`${userData.firstname} ${userData.lastname}`}
+                key={`${userData.firstname} ${userData.lastname}`}
                 borderRadius="full"
                 boxShadow="md"
                 cursor="pointer"
+                
               />
               <Input
                 type="file"
