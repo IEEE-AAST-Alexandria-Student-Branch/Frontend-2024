@@ -166,7 +166,6 @@ export const Profile = () => {
   };
 
   useEffect(()=>{
-    const auths=getUserAuthMethods()
     setAuthMethods(getUserAuthMethods())
   },[])
 
@@ -350,10 +349,6 @@ export const Profile = () => {
 
     try {
       const user = await getUser();
-      const storedProfilePicture =
-        typeof currentUserData.profilePicture === "string"
-          ? currentUserData.profilePicture
-          : "";
 
       if (typeof currentUserData.profilePicture !== "string") {
         const res = await addStorage(
