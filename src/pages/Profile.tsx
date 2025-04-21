@@ -65,7 +65,8 @@ interface IdUserData{
 }
 
 export const Profile = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Manage modal state
+  const { isOpen: isCoverPhotoModalOpen, onOpen: onOpenCoverPhotoModal, onClose: onCloseCoverPhotoModal } = useDisclosure(); // Manage cover photo modal state
+  const { isOpen: isProfilePictureModalOpen, onOpen: onOpenProfilePictureModal, onClose: onCloseProfilePictureModal } = useDisclosure(); // Manage profile picture modal state
   const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null); // State for the selected file
   const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false); // State for upload status
   const [userEmail, setUserEmail] = useState<string>("");
@@ -327,7 +328,7 @@ export const Profile = () => {
         coverPhoto: res.link,
       }));
 
-      onClose(); // Close the modal
+      onCloseCoverPhotoModal(); // Close the modal
     } catch (error) {
       console.error("Error updating cover photo:", error);
     } finally {
@@ -396,7 +397,7 @@ export const Profile = () => {
           {self && (
             <button
               className="rounded-full p-1 bg-[rgba(0,0,0,0.5)] hover:bg-[rgba(0,0,0,0.7)] transition-opacity duration-300 opacity-80 hover:opacity-100"
-              onClick={onOpen} // Open the modal
+              onClick={onOpenCoverPhotoModal} // Open the cover photo modal
             >
               <AiFillEdit color="white" className="w-6 h-6 md:w-10 md:h-10" />
             </button>
@@ -404,13 +405,13 @@ export const Profile = () => {
         </div>
 
         {self&&
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
+        <Modal isOpen={isCoverPhotoModalOpen} onClose={onCloseCoverPhotoModal} isCentered size={"xl"}>
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
             <ModalHeader fontSize={"2xl"}>Change Cover Photo</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-                <FormControl>
+                <FormControl className="flex flex-col items-center w-full">
                 {coverPhotoFile && (
                   <img
                   className={`w-full mb-4`}
@@ -420,7 +421,7 @@ export const Profile = () => {
                     <Text fontSize="sm" color="gray.500" mb={2}>
                     {coverPhotoFile ? coverPhotoFile.name : "No image selected"}
                     </Text>
-                <label htmlFor="cover-photo-upload">
+                <label htmlFor="cover-photo-upload" className="w-full">
                   <Button
                   as="span"
                   colorScheme="blue"
@@ -473,7 +474,7 @@ export const Profile = () => {
               >
                 Upload
               </Button>
-              <Button colorScheme="red" onClick={onClose}>
+              <Button colorScheme="red" onClick={onCloseCoverPhotoModal}>
                 Cancel
               </Button>
             </ModalFooter>
@@ -492,14 +493,14 @@ export const Profile = () => {
           />
           {self && (
             <div
-            onClick={onOpen}
+            onClick={onOpenProfilePictureModal} // Open the profile picture modal
             className="z-20 rounded-full w-24 h-24 md:w-32 md:h-32 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 cursor-pointer">
               <AiFillEdit color="white" className="w-5 h-5 md:w-7 md:h-7" />
           <p className="font-bold select-none text-xs md:text-base">EDIT</p>
             </div>
           )}
         </div>{self &&
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
+        <Modal isOpen={isProfilePictureModalOpen} onClose={onCloseProfilePictureModal} isCentered size={"xl"}>
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
             <ModalHeader fontSize={"2xl"}>Change Profile Picture</ModalHeader>
@@ -513,6 +514,9 @@ export const Profile = () => {
                   alt="Profile Preview"
                   />
                 )}
+                <Text fontSize="sm" color="gray.500" mb={2}>
+                    {coverPhotoFile ? coverPhotoFile.name : "No image selected"}
+                    </Text>
                 <label htmlFor="profile-picture-upload" className="w-full">
                   <Button
                     as="span"
@@ -572,7 +576,7 @@ export const Profile = () => {
               >
                 Upload
               </Button>
-              <Button colorScheme="red" onClick={onClose}>
+              <Button colorScheme="red" onClick={onCloseProfilePictureModal}>
                 Cancel
               </Button>
             </ModalFooter>
