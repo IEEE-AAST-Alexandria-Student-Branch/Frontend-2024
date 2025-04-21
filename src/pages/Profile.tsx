@@ -354,7 +354,7 @@ export const Profile = () => {
       </Slide>
       <div className="pt-[100px] mx-8 md:mx-32 flex flex-col justify-center">
         <div
-          className="bg-cover bg-center mt-11 h-[100px] md:w-full md:h-[300px] rounded-3xl relative flex items-start justify-end p-2"
+          className="bg-cover bg-center mt-6 md:mt-11 h-[200px] -left-[10%] w-[120%] md:left-0 md:w-full md:h-[300px] md:rounded-3xl relative flex items-start justify-end p-2 md:px-2"
           style={{
             backgroundImage: `url(${selectedUserData?.coverPhoto || defaultCover})`,
           }}
@@ -364,7 +364,7 @@ export const Profile = () => {
               className="rounded-full p-1 bg-[rgba(0,0,0,0.5)] hover:bg-[rgba(0,0,0,0.7)] transition-opacity duration-300 opacity-80 hover:opacity-100"
               onClick={onOpen} // Open the modal
             >
-              <AiFillEdit color="white" size={36} />
+              <AiFillEdit color="white" className="w-6 h-6 md:w-10 md:h-10" />
             </button>
           )}
         </div>
@@ -404,12 +404,12 @@ export const Profile = () => {
           </ModalContent>
         </Modal>
 
-        <div className=" ml-8 md:ml-16 -mt-14 md:-mt-20 z-0 relative">
+        <div className=" md:ml-16 -mt-14 md:-mt-20 z-0 relative">
             <Avatar
               className="absolute z-10 w-24 h-24 md:w-40 md:h-40 rounded-full object-cover mb-4"
               src={typeof currentUserData?.profilePicture === "string" ? currentUserData.profilePicture : undefined}
               name={`${currentUserData.firstname} ${currentUserData.lastname}`}
-              size={"2xl"}
+              size={{md:"2xl", base:"xl"}}
             />
         </div>
         <Tabs size='sm' variant={'unstyled'}>
