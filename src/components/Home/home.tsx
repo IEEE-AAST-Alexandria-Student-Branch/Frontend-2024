@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../../App";
 import { AppConfigContext } from "../../App";
 import { RecruitmentCard } from "./RecruitmentCard";
+import { hideNavBarContext } from "../../App";
+import { CiImageOn } from "react-icons/ci";
 
 export const HomeComp = () => {
     const [email, setEmail] = useState("");
@@ -11,6 +13,7 @@ export const HomeComp = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { userData } = useContext(UserContext);
     const { appConfig } = useContext(AppConfigContext);
+    const { hideNavBar, setHideNavBar } = useContext(hideNavBarContext);
 
     const handleJoinUsClick = () => {
         if (email) {
@@ -38,10 +41,30 @@ export const HomeComp = () => {
     }, [email]);
 
     return (
-        <div className="flex flex-col bg-cover bg-center w-full h-screen bg-homeImage overflow-hidden">
-            <div className="absolute w-full h-screen bg-gradient-to-t from-[#000B21]/90 via-transparent to-[#000B21]/90"></div>
-            <div className="absolute w-full h-screen bg-gradient-to-r from-[#000B21]/90 via-transparent to-[#000B21]/90"></div>
-            <div className={`flex flex-col justify-center w-full h-full ${appConfig.recruitment.recruiting&&appConfig.recruitment.formLink.length>0 ? 'mt-36' : 'mt-14'}`}>
+        <div
+            className="flex flex-col bg-cover bg-center w-full h-screen overflow-hidden"
+            style={{ backgroundImage: `url(${appConfig.coverPhoto})` }}
+        >
+            {/* Background Gradient */}
+            <div
+                className={`absolute w-full h-screen bg-gradient-to-t from-[#000B21]/90 via-transparent to-[#000B21]/90 transition-opacity duration-500 ${
+                    hideNavBar ? "opacity-0" : "opacity-100"
+                }`}
+            ></div>
+            <div
+                className={`absolute w-full h-screen bg-gradient-to-r from-[#000B21]/90 via-transparent to-[#000B21]/90 transition-opacity duration-500 ${
+                    hideNavBar ? "opacity-0" : "opacity-100"
+                }`}
+            ></div>
+
+            {/* Main Content */}
+            <div
+                className={`flex flex-col justify-center w-full transition-opacity h-full ${
+                    appConfig.recruitment.recruiting && appConfig.recruitment.formLink.length > 0
+                        ? "mt-36"
+                        : "mt-14"
+                } ${hideNavBar ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            >
                 <div className="flex flex-col justify-start mx-4 md:mx-20 w-full container z-10">
                     <div className="xl:text-4xl md:text-xl sm:text-sm font-bold">
                         <p>Fostering innovation through education</p>
@@ -51,7 +74,9 @@ export const HomeComp = () => {
                     {userData ? (
                         <div className="flex flex-col gap-2">
                             <p className="text-2xl font-normal w-full mt-5">Welcome back, {userData.firstname}!</p>
-                            <Link to="/browse"><button className="defaultButton">Browse</button></Link>
+                            <Link to="/browse">
+                                <button className="defaultButton">Browse</button>
+                            </Link>
                         </div>
                     ) : (
                         <>
@@ -81,8 +106,24 @@ export const HomeComp = () => {
                     <RecruitmentCard />
                 </div>
             </div>
-            <div className="flex flex-col items-center pb-4 z-10">
-                <p>Join 120+ trusted distinguished partners.</p>
+
+            {/* Footer Section */}
+            <div className="flex justify-between w-full">
+                <div
+                    className={`flex flex-col items-center justify-center w-full pb-4 z-10 transition-opacity relative ${
+                        hideNavBar ? "opacity-0 pointer-events-none" : "opacity-100"
+                    }`}
+                >
+                    <p className="text-center w-40 sm:w-full">Join 120+ trusted distinguished partners.</p>
+                </div>
+                <div
+                    className="bg-slate-600 rounded-full p-2 mr-2 absolute z-10 cursor w-16 h-16 right-0 sm:-translate-y-8"
+                    onMouseEnter={() => setHideNavBar(true)}
+                    onMouseLeave={() => setHideNavBar(false)}
+                    onClick={() => setHideNavBar(!hideNavBar)}
+                >
+                    <CiImageOn className="w-full h-full"></CiImageOn>
+                </div>
             </div>
         </div>
     );

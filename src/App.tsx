@@ -42,6 +42,7 @@ export const AppConfigContext = createContext<{
     contactEmail: string | null;
     headsCarouselSettings: any | null;
     recruitment: Recruitment;
+    coverPhoto: string | null;
   };
 }>({
   appConfig: {
@@ -50,8 +51,16 @@ export const AppConfigContext = createContext<{
     recruitment: {
       recruiting: false,
       formLink: ""
-    }
+    },
+    coverPhoto: null
   }
+});
+export const hideNavBarContext = createContext<{
+  hideNavBar: boolean;
+  setHideNavBar: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  hideNavBar: false,
+  setHideNavBar: () => { }
 });
 
 function App() {
@@ -59,6 +68,7 @@ function App() {
   const [userData, setUserData] = useState<any>(null);
   const [userId, setUserId] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hideNavBar,setHideNavBar] = useState(false);
 
   const [appConfig, setAppConfig] = useState({
     contactEmail: null as string | null,
@@ -67,6 +77,7 @@ function App() {
       recruiting: false,
       formLink: "",
     } as Recruitment,
+    coverPhoto: null as string | null
   });
 
   const fetchUser = async () => {
@@ -90,14 +101,15 @@ function App() {
       const contactEmail = (await getDocument("adminSettings", "contactEmail"))
       const headsCarouselSettings = await getDocument("adminSettings", "headsCarouselSettings");
       const recruitment = await getDocument("adminSettings", "recruitment");
+      const coverPhoto = await getDocument("adminSettings", "coverPhoto");
       setAppConfig({
         contactEmail: contactEmail.result?.data()?.email,
         headsCarouselSettings: headsCarouselSettings.result?.data(),
-        //recruitingLink: recruitment.result?.data()?.formlink
         recruitment: {
           recruiting: recruitment.result?.data()?.recruiting || false,
           formLink: recruitment.result?.data()?.formLink || ""
-        }
+        },
+        coverPhoto: coverPhoto.result?.data()?.link || null
       });
     } catch (error) {
       console.error("Error fetching app config:", error);
@@ -112,7 +124,8 @@ function App() {
   return loading ? <div className="h-screen flex justify-center items-center"><Spinner size={"xl"} className="flex " /></div> : (
     <UserContext.Provider value={{ userData, setUserData, userId, setUserId }}>
       <AppConfigContext.Provider value={{ appConfig }}>
-        <NavBar />
+        <hideNavBarContext.Provider value={{ hideNavBar, setHideNavBar }}>
+        <NavBar hideNavBar={hideNavBar}/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Dashboard />} />
@@ -130,6 +143,7 @@ function App() {
           <Route path="/bookmarks" element={<Bookmarks />} />
         </Routes>
         <Footer />
+        </hideNavBarContext.Provider>
       </AppConfigContext.Provider>
     </UserContext.Provider>
   );

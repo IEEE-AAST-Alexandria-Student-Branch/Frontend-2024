@@ -470,7 +470,7 @@ export const Profile = () => {
                 onClick={handleCoverPhotoChange}
                 isLoading={uploadingCoverPhoto} // Show loading state
                 loadingText="Uploading"
-                disabled={!coverPhotoFile} // Disable button if no file is selected
+                disabled={!coverPhotoFile || uploadingCoverPhoto} // Disable button if no file is selected
               >
                 Upload
               </Button>
@@ -515,7 +515,7 @@ export const Profile = () => {
                   />
                 )}
                 <Text fontSize="sm" color="gray.500" mb={2}>
-                    {coverPhotoFile ? coverPhotoFile.name : "No image selected"}
+                    {currentUserData.profilePicture instanceof File ? currentUserData.profilePicture.name : "No image selected"}
                     </Text>
                 <label htmlFor="profile-picture-upload" className="w-full">
                   <Button
@@ -572,7 +572,7 @@ export const Profile = () => {
                 }}
                 isLoading={uploadingProfilePicture} // Show loading state
                 loadingText="Uploading"
-                disabled={!currentUserData.profilePicture||uploadingProfilePicture} // Disable button if no file is selected
+                disabled={!(currentUserData.profilePicture instanceof File) || uploadingProfilePicture} // Disable button if no file is selected
               >
                 Upload
               </Button>

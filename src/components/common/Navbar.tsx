@@ -45,8 +45,10 @@ interface IdUserData{
   id: string;
   userData: UserData;
 }
-
-export const NavBar: React.FC = () => {
+interface NavBarProps {
+  hideNavBar?: boolean;
+}
+export const NavBar: React.FC<NavBarProps> = ({ hideNavBar }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileSearch, setMobileSearch] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -208,11 +210,11 @@ export const NavBar: React.FC = () => {
     <>
       <div className="wrapper absolute flex items-start sm:items-center justify-between py-2 w-full z-50">
 
-        {/* left */}
-        <LogoButton />
+
+        <LogoButton className={`${hideNavBar&&"opacity-0"} transition-opacity`} />
 
         {/* mid and right*/}
-        <div className="flex-1 justify-start hidden sm:flex">
+        <div className={`flex-1 justify-start hidden sm:flex transition-opacity ${hideNavBar && "opacity-0"}`}>
           <div className="flex justify-center gap-3 ml-5 w-full">
             <button>
               <Link to="/" >
@@ -332,7 +334,7 @@ export const NavBar: React.FC = () => {
 
           </div>
         </div>
-        <div className="items-center justify-end text-3xl gap-8 mr-8 text-black hidden sm:flex">
+        <div className={`items-center justify-end text-3xl gap-8 mr-8 transition-opacity text-black hidden sm:flex ${hideNavBar && "opacity-0"}`}>
           {!userData ? <button className="font-bold text-base">
             <Link to={"/signin"} className="text-base bg-white px-8 py-4 rounded-full">{"Sign In"}</Link>
           </button> : <ProfileMenu />
