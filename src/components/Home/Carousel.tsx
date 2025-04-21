@@ -35,7 +35,13 @@ export const SwipeCarousel = () => {
 
   const handleAwardClick = (index: number) => {
     if (swiperRef.current) {
-      swiperRef.current.slideTo(index); // Scroll to the clicked award
+      
+      const currentIndex = swiperRef.current.realIndex;
+      if (index === currentIndex) {
+        swiperRef.current.slidePrev();
+      } else if (index === (currentIndex + 2) % awards.length) {
+        swiperRef.current.slideNext();
+      }
     }
   };
 
