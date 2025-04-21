@@ -222,7 +222,8 @@ export const handleGoogleSignIn = async () => {
       likes: { events: [], articles: [] },
       followers: [],
       roles: [],
-      following: { events: [], users: [] }
+      following: { events: [], users: [] },
+      bookmarks: { articles: [] }
     };
     if (result?.user?.uid) {
       const userExists = await docExists("users", result.user.uid);
