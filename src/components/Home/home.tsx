@@ -76,7 +76,7 @@ export const HomeComp = () => {
                     {userData ? (
                         <div className="flex flex-col gap-2">
                             <p className="text-2xl font-normal w-full mt-5">Welcome back, {userData.firstname}!</p>
-                            <Link to="/browse">
+                            <Link to="/browse" className="w-fit">
                                 <button className="defaultButton">Browse</button>
                             </Link>
                         </div>

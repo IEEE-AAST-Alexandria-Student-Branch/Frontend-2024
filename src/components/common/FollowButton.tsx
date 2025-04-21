@@ -33,7 +33,7 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
       const canFollow=(currentUserId&&isEmailVerified)?true:false;
     return (
         <button
-            className={`defaultButton ${className}`}
+        className={`bg-white text-black text-[12pt] font-semibold font-[SF-Pro-Text-Medium] border-none cursor-pointer w-24 sm:w-[140px] h-[40px] rounded-full ${className}`}
             onClick={() => {
                 if(canFollow){
                     toggleFollow(
