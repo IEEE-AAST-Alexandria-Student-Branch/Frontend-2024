@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent, useContext, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { AiFillEdit } from "react-icons/ai";
+import { MdErrorOutline } from "react-icons/md";
 import {
   Input,
   FormControl,
@@ -76,6 +77,8 @@ export const Profile = () => {
   const [showFollowersModal, setShowFollowersModal] = useState<boolean>(false);
   const [showFollowingModal, setShowFollowingModal] = useState<boolean>(false);
   const [authMethods, setAuthMethods] = useState<any>(null);
+  const [showSizeError, setShowSizeError] = useState<boolean>(false);
+  const [uploadingProfilePicture, setUploadingProfilePicture] = useState(false); // New state for profile picture upload
   const navigate = useNavigate();
 
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -164,7 +167,6 @@ export const Profile = () => {
 
   useEffect(()=>{
     const auths=getUserAuthMethods()
-    console.log(auths);
     setAuthMethods(getUserAuthMethods())
   },[])
 
@@ -248,11 +250,6 @@ export const Profile = () => {
     }
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    setCurrentUserData({ ...currentUserData, profilePicture: file });
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     resetError();
     const storedcurrentUserData = {
@@ -260,13 +257,11 @@ export const Profile = () => {
       imgurl: typeof currentUserData.profilePicture === "string" ? currentUserData.profilePicture : "",
       desc: convertNewLinesToBRTags(currentUserData.desc),
     };
-    console.log(storedcurrentUserData);
     event.preventDefault();
     const user = await getUser();
     const { mobile, profilePicture } = currentUserData;
 
     if (profilePicture) {
-      console.log(currentUserData.profilePicture);
       if (typeof profilePicture !== "string") {
         const res = await addStorage(currentUserData.profilePicture, `profilepics/${user.uid}`);
         storedcurrentUserData.imgurl = res.link;
@@ -341,11 +336,55 @@ export const Profile = () => {
     }
   };
 
+  const handleProfilePictureUpload = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    resetError();
+
+    if (!currentUserData.profilePicture) {
+      setErrorMessage("Please select a profile picture to upload.");
+      setShowError(true);
+      return;
+    }
+
+    setUploadingProfilePicture(true); // Start loading state
+
+    try {
+      const user = await getUser();
+      const storedProfilePicture =
+        typeof currentUserData.profilePicture === "string"
+          ? currentUserData.profilePicture
+          : "";
+
+      if (typeof currentUserData.profilePicture !== "string") {
+        const res = await addStorage(
+          currentUserData.profilePicture,
+          `profilepics/${user.uid}`
+        );
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        await updateData("users", user.uid, { imgurl: res.link });
+        setCurrentUserData((prev) => ({
+          ...prev,
+          profilePicture: res.link,
+        }));
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      setErrorMessage("An error occurred while uploading the profile picture.");
+      setShowError(true);
+    } finally {
+      setUploadingProfilePicture(false); // End loading state
+    }
+  };
+
   // Determine if Tabs should be displayed
   if(!currentUserData||!selectedUserData) return <Center h={'100vh'}><Spinner size='xl'/></Center>
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <Slide direction="top" in={showSuccess} style={{ zIndex: 300 }}>
         <Alert status="success" variant="solid" zIndex={300}>
           <AlertIcon />
@@ -354,7 +393,7 @@ export const Profile = () => {
       </Slide>
       <div className="pt-[100px] mx-8 md:mx-32 flex flex-col justify-center">
         <div
-          className="bg-cover bg-center mt-6 md:mt-11 h-[200px] -left-[10%] w-[120%] md:left-0 md:w-full md:h-[300px] md:rounded-3xl relative flex items-start justify-end p-2 md:px-2"
+          className="bg-cover bg-center mt-6 md:mt-11 h-[200px] -left-[10%] w-[120%] md:left-0 md:w-full md:h-[300px] md:rounded-3xl relative flex items-start justify-end p-2"
           style={{
             backgroundImage: `url(${selectedUserData?.coverPhoto || defaultCover})`,
           }}
@@ -370,21 +409,63 @@ export const Profile = () => {
         </div>
 
         {/* Modal for Cover Photo Upload */}
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
             <ModalHeader fontSize={"2xl"}>Change Cover Photo</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl>
+                <FormControl>
+                {coverPhotoFile && (
+                  <img
+                  className={`w-full mb-4`}
+                  src={URL.createObjectURL(coverPhotoFile)}
+                  alt="Selected Cover Photo Preview"
+                  />)}
+                    <Text fontSize="sm" color="gray.500" mb={2}>
+                    {coverPhotoFile ? coverPhotoFile.name : "No image selected"}
+                    </Text>
+                <label htmlFor="cover-photo-upload">
+                  <Button
+                  as="span"
+                  colorScheme="blue"
+                  size="sm"
+                  w={"full"}
+                  mb={4}
+                  cursor="pointer"
+                  _hover={{ bg: "blue.600" }}
+                  >
+                  Choose File
+                  </Button>
+                </label>
+                
                 <Input
+                  id="cover-photo-upload"
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
-                    setCoverPhotoFile(e.target.files ? e.target.files[0] : null)
+                  display="none"
+                  onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    if (e.target.files[0].size > 2 * 1024 * 1024) { // 2MB limit
+                    setCoverPhotoFile(null);
+                    setShowSizeError(true);
+                    e.target.value = "";
+                    } else {
+                    setCoverPhotoFile(e.target.files ? e.target.files[0] : null);
+                    setShowSizeError(false);
+                    }
                   }
+                  }}
                 />
-              </FormControl>
+                {showSizeError && (
+                  <div className="flex gap-1 items-center">
+                  <MdErrorOutline color={"#c53030"} size={25} />
+                  <Text color={"#c53030"} fontWeight={"bold"}>
+                    That image exceeds the 2MB size limit.
+                  </Text>
+                  </div>
+                )}
+                </FormControl>
             </ModalBody>
             <ModalFooter>
               <Button
@@ -397,21 +478,112 @@ export const Profile = () => {
               >
                 Upload
               </Button>
-              <Button variant="ghost" onClick={onClose}>
+              <Button colorScheme="red" onClick={onClose}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <div className="md:ml-16 -mt-14 md:-mt-20 z-0 relative group w-24 h-24 md:w-40 md:h-40">
+          <Avatar
+            className={`absolute z-10 w-full h-full rounded-full object-cover mb-4 transition-transform duration-300 ${self&&"group-hover:scale-110"}`}
+            src={
+              typeof currentUserData?.profilePicture === "string"
+          ? currentUserData.profilePicture
+          : selectedUserData?.imgurl || undefined
+            }
+            name={`${currentUserData.firstname} ${currentUserData.lastname}`}
+            size={{ md: "2xl", base: "xl" }}
+          />
+          {self && (
+            <div
+            onClick={onOpen}
+            className="z-20 rounded-full w-24 h-24 md:w-32 md:h-32 absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 cursor-pointer">
+              <AiFillEdit color="white" className="w-5 h-5 md:w-7 md:h-7" />
+          <p className="font-bold select-none text-xs md:text-base">EDIT</p>
+            </div>
+          )}
+        </div>
+        <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
+          <ModalOverlay />
+          <ModalContent backgroundColor={"#151F33"}>
+            <ModalHeader fontSize={"2xl"}>Change Profile Picture</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl className="flex flex-col items-center w-full">
+                {typeof currentUserData.profilePicture !== "string" && currentUserData.profilePicture && (
+                  <img
+                  className="mx-auto mb-4 w-full"
+                  src={URL.createObjectURL(currentUserData.profilePicture)}
+                  alt="Profile Preview"
+                  />
+                )}
+                <label htmlFor="profile-picture-upload" className="w-full">
+                  <Button
+                    as="span"
+                    colorScheme="blue"
+                    size="sm"
+                    w={"full"}
+                    mb={4}
+                    cursor="pointer"
+                    _hover={{ bg: "blue.600" }}
+                  >
+                    Choose File
+                  </Button>
+                </label>
+                <Input
+                  id="profile-picture-upload"
+                  type="file"
+                  accept="image/*"
+                  display="none"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      if (e.target.files[0].size > 2 * 1024 * 1024) {
+                        // 2MB limit
+                        setCurrentUserData({ ...currentUserData, profilePicture: null });
+                        setShowSizeError(true);
+                        e.target.value = "";
+                      } else {
+                        setCurrentUserData({
+                          ...currentUserData,
+                          profilePicture: e.target.files[0],
+                        });
+                        setShowSizeError(false);
+                      }
+                    }
+                  }}
+                />
+                {showSizeError && (
+                  <div className="flex gap-1 items-center">
+                    <MdErrorOutline color={"#c53030"} size={25} />
+                    <Text color={"#c53030"} fontWeight={"bold"}>
+                      That image exceeds the 2MB size limit.
+                    </Text>
+                  </div>
+                )}
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleProfilePictureUpload(e as unknown as FormEvent<HTMLFormElement>);
+                }}
+                isLoading={uploadingProfilePicture} // Show loading state
+                loadingText="Uploading"
+                disabled={!currentUserData.profilePicture||uploadingProfilePicture} // Disable button if no file is selected
+              >
+                Upload
+              </Button>
+              <Button colorScheme="red" onClick={onClose}>
                 Cancel
               </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
 
-        <div className=" md:ml-16 -mt-14 md:-mt-20 z-0 relative">
-            <Avatar
-              className="absolute z-10 w-24 h-24 md:w-40 md:h-40 rounded-full object-cover mb-4"
-              src={typeof currentUserData?.profilePicture === "string" ? currentUserData.profilePicture : undefined}
-              name={`${currentUserData.firstname} ${currentUserData.lastname}`}
-              size={{md:"2xl", base:"xl"}}
-            />
-        </div>
         <Tabs size='sm' variant={'unstyled'}>
           <div className="flex  justify-between items-center flex-wrap">
             
@@ -502,39 +674,23 @@ export const Profile = () => {
                   <div className="max-w-[600px]">
                     <Text fontFamily={"SF-Pro-Display-Bold"} fontSize={23} mb={4}>Edit Profile</Text>
                     <form onSubmit={ handleSubmit }>
-                      <Text fontFamily={"SF-Pro-Display-Bold"} mb={4}>Change your Profile Picture:</Text>
-                      <FormControl isInvalid={showError && mobileInvalid}>
-                        <label htmlFor="profile-picture">
-                          <Avatar
-                            size="xl"
-                            src={
-                              currentUserData.profilePicture
-                                ? typeof currentUserData.profilePicture === "string"
-                                  ? `${currentUserData.profilePicture}`
-                                  : URL.createObjectURL(currentUserData.profilePicture)
-                                : "src/assets/add-profile-picture-white@2x.png"
-                            }
-                            borderRadius="full"
-                            boxShadow="lg"
-                            cursor="pointer"
-                            mb={8}
-                            name={`${currentUserData.firstname} ${currentUserData.lastname}`}
-                          />
-                          <Input
-                            type="file"
-                            id="profile-picture"
-                            name="profilePicture"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            display="none"
-                            position="absolute"
-                            opacity={0}
-                            zIndex={-1}
-                          />
-                        </label>
+                      
+                      <Text fontFamily={'SF-Pro-Display-Bold'} mb={2}>Description: </Text>
+                      <FormControl mb={10}>
+                        <Textarea
+                        className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 h-[200px] md:h-[300px] box-border resize-y"
+                          id="desc"
+                          resize={"none"}
+                          name="Description"
+                          value={convertBRTagsToNewLines(currentUserData.desc)}
+                          onChange={handleChange}
+                          placeholder="Describe yourself"
+                          boxSizing="border-box"
+                          flexWrap={"wrap"}
+                          flex={"flexbox"}
+                        />
                       </FormControl>
-
-                      <Text fontFamily={"SF-Pro-Display-Bold"}>Change your mobile number:</Text>
+                      <Text fontFamily={"SF-Pro-Display-Bold"}>Change your mobile number (This is private):</Text>
                       <FormControl isInvalid={showError && mobileInvalid}>
                         <Input
                           type="tel"
@@ -556,21 +712,6 @@ export const Profile = () => {
                         </FormErrorMessage>
                       </FormControl>
 
-                      <Text fontFamily={'SF-Pro-Display-Bold'} mb={2}>Description: </Text>
-                      <FormControl mb={10}>
-                        <Textarea
-                        className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 h-[200px] md:h-[300px] box-border resize-y"
-                          id="desc"
-                          resize={"none"}
-                          name="Description"
-                          value={convertBRTagsToNewLines(currentUserData.desc)}
-                          onChange={handleChange}
-                          placeholder="Describe yourself"
-                          boxSizing="border-box"
-                          flexWrap={"wrap"}
-                          flex={"flexbox"}
-                        />
-                      </FormControl>
                         <Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Social Media Links: </Text>
                         <FormControl mb={4} isInvalid={showError && !currentUserData.socials?.every(social => social.url === "" || isValidUrl(social.url))}>
                           <Input
