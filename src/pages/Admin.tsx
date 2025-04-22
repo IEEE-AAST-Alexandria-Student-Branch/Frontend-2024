@@ -119,7 +119,6 @@ export const Admin = () => {
         if (!b.starttime) return 1;
         return (b.starttime || 0) - (a.starttime || 0);
       });
-      console.log(sortedEvents);
       setEvents(sortedEvents || []);
     }
   };

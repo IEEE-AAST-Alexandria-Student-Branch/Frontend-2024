@@ -263,7 +263,6 @@ export const SignUp = () => {
                 className="flex items-center gap-2 bg-white text-black font-medium px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-shadow self-start mt-2"
                 onClick={() => {
                   handleGoogleSignIn();
-                  console.log("Google Sign-In clicked");
                 }}
                 type="button"
               >

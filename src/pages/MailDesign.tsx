@@ -14,7 +14,6 @@ export const MailDesign = () => {
 
   const fetchUser = async () => {
     const user = await getUser()
-    console.log(user.uid)
     if (user.uid) {
       await getDocument("users", user.uid).then(res => {
         if (res.result && !res.error) {

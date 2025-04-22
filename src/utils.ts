@@ -123,7 +123,6 @@ export const toggleBookMark = async (
   if (!userData.bookmarks) {
     await ensureUserFieldExist(userId);
     await getDocument('users', userId);
-    console.log("creating bookmarks")
   }
 
   if (item.id) {

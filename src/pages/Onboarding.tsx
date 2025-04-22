@@ -80,7 +80,6 @@ export const Onboarding = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
   };
 
   useEffect(() => {

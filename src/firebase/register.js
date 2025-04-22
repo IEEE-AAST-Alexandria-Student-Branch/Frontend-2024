@@ -31,7 +31,6 @@ export default async function register(email, password) {
       error = "Internal error. Please try again later.";
     } else {
       error = "An error occurred. Please try again later.";
-      console.log(e);
     }
   }
 

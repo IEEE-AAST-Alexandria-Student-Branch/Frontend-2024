@@ -50,12 +50,6 @@ export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
     fetchArticle();
   }, [fetchArticle]);
 
-  // Log for debugging
-  useEffect(() => {
-    console.log("Article Data:", articleData);
-    console.log("Author Data:", author);
-  }, [articleData, author]);
-
   const formatDate = (timestamp: Timestamp) => {
     if (!timestamp) return "N/A";
     const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);

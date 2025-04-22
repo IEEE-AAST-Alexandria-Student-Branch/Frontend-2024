@@ -65,7 +65,6 @@ export const Bookmarks = () => {
 
   }
 
-  console.log(articles)
 
   useEffect(() => {
     fetchData();

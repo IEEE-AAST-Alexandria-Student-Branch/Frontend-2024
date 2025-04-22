@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 
 export const Article = () => {
   const { name } = useParams();
-  console.log("title",name)
 
   return (
     <>

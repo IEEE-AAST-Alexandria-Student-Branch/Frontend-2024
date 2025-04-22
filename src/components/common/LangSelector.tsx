@@ -12,7 +12,6 @@ export const LangSelector = () => {
 
   const handleSelect = (languageId: string) => {
     //setLang(languageId);
-    console.log(languageId);
     setIsOpen(false);
   };
 

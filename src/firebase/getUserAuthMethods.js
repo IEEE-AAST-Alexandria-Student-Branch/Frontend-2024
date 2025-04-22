@@ -6,10 +6,8 @@ export const getUserAuthMethods = () => {
 
   if (user) {
     const authMethods = user.providerData.map((provider) => provider.providerId);
-    console.log("Authentication methods:", authMethods);
     return authMethods;
   } else {
-    console.log("No user is signed in.");
     return [];
   }
 };
