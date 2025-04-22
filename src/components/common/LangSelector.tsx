@@ -10,10 +10,10 @@ export const LangSelector = () => {
     { name: "العربية", id: "ar" }
   ];
 
-  const handleSelect = (languageId: string) => {
+  /*const handleSelect = (languageId: string) => {
     //setLang(languageId);
     setIsOpen(false);
-  };
+  };*/
 
   return (
     <div className="hidden relative text-left">
@@ -30,7 +30,8 @@ export const LangSelector = () => {
           {disLang.map((language, index) => (
             <div 
               key={index}
-              onClick={() => handleSelect(language.id)}
+              onClick={() => {//handleSelect(language.id)
+                }}
               className="px-4 py-2 cursor-pointer hover:bg-gray-700"
             >
               {language.name}
