@@ -96,15 +96,6 @@ export const Profile = () => {
     ALLOWED_TAGS: ['br', 'strong', 'em', 'ul', 'ol', 'li'],
   };
 
-  const isValidUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
   const getUsers = async (ids: string[]) => {
     const users = await getDocumentsById("users", ids);
     return users.documents
