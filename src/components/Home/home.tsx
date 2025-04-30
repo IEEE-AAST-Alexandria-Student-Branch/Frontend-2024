@@ -68,7 +68,7 @@ export const HomeComp = () => {
                 } ${hideNavBar ? "opacity-0 pointer-events-none" : "opacity-100"}`}
             >
                 <div className="flex flex-col justify-start mx-4 md:mx-20 w-full container z-10">
-                    <div className="xl:text-4xl md:text-xl sm:text-sm font-bold">
+                    <div className="xl:text-4xl md:text-xl sm:text-sm font-bold [@media(max-height:500px)]:hidden">
                         <p>Fostering innovation through education</p>
                         <p>technology, and professional</p>
                         <p>development.</p>
