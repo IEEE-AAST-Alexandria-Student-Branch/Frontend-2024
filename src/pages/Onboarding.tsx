@@ -64,6 +64,12 @@ export const Onboarding = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
+
+    if (file && !["image/png", "image/jpeg", "image/gif"].includes(file.type)) {
+      window.alert("Please upload a valid image file (PNG, JPG, or GIF).");
+      return;
+    }
+
     setFormData({ ...formData, profilePicture: file });
   };
 

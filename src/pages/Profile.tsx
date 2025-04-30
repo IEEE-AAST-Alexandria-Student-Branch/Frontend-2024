@@ -441,6 +441,11 @@ export const Profile = () => {
                   accept="image/*"
                   display="none"
                   onChange={(e) => {
+                    const file = e.target.files ? e.target.files[0] : null;
+                    if (file && !["image/png", "image/jpeg", "image/gif"].includes(file.type)) {
+                      window.alert("Please upload a valid image file (PNG, JPG, or GIF).");
+                      return;
+                    }
                   if (e.target.files && e.target.files.length > 0) {
                     if (e.target.files[0].size > 2 * 1024 * 1024) { // 2MB limit
                     setCoverPhotoFile(null);
