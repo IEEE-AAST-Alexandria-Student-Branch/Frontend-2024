@@ -86,7 +86,7 @@ export const Signin = () => {
     checkUser();
   }, []);
   return (
-    <div className="min-h-fit">
+    <div className="min-h-fit relative">
         <Slide direction="top" in={showSentEmail} style={{ zIndex: 300 }}>
         <Alert status="success" variant="solid" zIndex={300}>
           <AlertIcon />
@@ -96,7 +96,7 @@ export const Signin = () => {
       <div className="h-screen w-[1vh] absolute left-0" style={{
         backgroundImage: "linear-gradient(to bottom, #1F396E, #1D0021)"
       }}></div>
-      <div className="form-container" style={{backgroundImage: `url(${Triangle})`, backgroundSize:"20%", backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom'}}>
+      <div className="form-container z-20 relative">
         <div className="p-20 min-h-screen">
           <div className="max-w-[600px] sm:mt-40  max-sm:mt-10" style={{}}>
             <h1 className="text-center sm:text-left text-4xl sm:text-4xl mb-8" style={{ fontWeight: 'bold' }}>
@@ -118,6 +118,7 @@ export const Signin = () => {
                     border: 'none',
                     borderBottom: '1px solid rgb(4, 4, 62)',
                     outline: 'none',
+                    backgroundColor: "#000B21"
 
                   }}
                 />
@@ -136,6 +137,7 @@ export const Signin = () => {
                     border: 'none',
                     borderBottom: '1px solid rgb(4, 4, 62)',
                     outline: 'none',
+                    backgroundColor: "#000B21"
                   }}
                 />
                 <span className="px-4 text-blue-500 cursor-pointer w-44" onClick={()=>setIsOpen(true)}>Forgot password?</span>
@@ -235,6 +237,9 @@ export const Signin = () => {
               </ModalFooter>
             </ModalContent>
           </Modal>
+          <div className="fixed -bottom-4 right-0 w-80 h-auto z-0">
+            <img src={Triangle} alt="Triangle" />
+          </div>
     </div>
   );
 };

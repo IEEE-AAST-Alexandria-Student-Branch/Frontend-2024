@@ -1,8 +1,10 @@
 .footer-container {
-  background-color: #ffffff15;
+  background-color: #151F33;
   margin: 15px;
   border-radius: 30px;
   padding: 30px 80px;
+  position:relative;
+  z-index:30;
 }
 @media (max-width: 797px) {
   .footer-container {

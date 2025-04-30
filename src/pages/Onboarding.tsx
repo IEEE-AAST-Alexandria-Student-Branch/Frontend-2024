@@ -64,7 +64,10 @@ export const Onboarding = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
-
+    if (file && file.size > 2 * 1024 * 1024) { // 2MB in bytes
+      window.alert("File size exceeds 2MB. Please upload a smaller file.");
+      return;
+    }
     if (file && !["image/png", "image/jpeg", "image/gif"].includes(file.type)) {
       window.alert("Please upload a valid image file (PNG, JPG, or GIF).");
       return;
@@ -106,14 +109,8 @@ export const Onboarding = () => {
       ></div>
       <div
         className="form-container relative z-10"
-        style={{
-          backgroundImage: `url(${Triangle})`,
-          backgroundSize: "20%",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "right bottom",
-        }}
       >
-        <div className="flex flex-col justify-center p-16 h-screen">
+        <div className="flex flex-col justify-center p-16 h-screen relative z-20">
           <div className="max-w-[600px]">
             <h1 className="text-4xl sm:text-6xl pb-2">Hey, {userData.firstname}</h1>
             <p className="pt-4 pb-8 text-left">
@@ -152,6 +149,7 @@ export const Onboarding = () => {
                   value={formData.mobile}
                   onChange={handleChange}
                   required
+                  style={{backgroundColor: "#000B21"}}
                 />
                 {isMobileInvalid && (
                   <FormErrorMessage>
@@ -176,6 +174,9 @@ export const Onboarding = () => {
             </div>
           </div>
         </div>
+        <div className="fixed -bottom-4 right-0 w-80 h-auto z-0">
+            <img src={Triangle} alt="Triangle" />
+          </div>
       </div>
     </div>
   );

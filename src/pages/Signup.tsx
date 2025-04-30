@@ -116,8 +116,8 @@ export const SignUp = () => {
           backgroundImage: "linear-gradient(to bottom, #1F396E, #1D0021)",
         }}
       ></div>
-      <div className="form-container relative z-10" style={{backgroundImage: `url(${Triangle})`, backgroundSize:"20%", backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom'}}>
-        <div className="p-20 min-h-screen">
+      <div className="form-container relative">
+        <div className="p-20 min-h-screen relative z-20">
           <div className="max-w-[600px] mt-40 max-sm:mt-10">
             <h1 className="text-4xl sm:text-4xl" style={{ fontWeight: "bold" }}>
               Let's get to know each other
@@ -141,6 +141,7 @@ export const SignUp = () => {
                     border: "none",
                     borderBottom: "1px solid rgb(4, 4, 62)",
                     outline: "none",
+                    backgroundColor: "#000B21"
                   }}
                 />
               </FormControl>
@@ -160,6 +161,7 @@ export const SignUp = () => {
                     border: "none",
                     borderBottom: "1px solid rgb(4, 4, 62)",
                     outline: "none",
+                    backgroundColor: "#000B21"
                   }}
                 />
               </FormControl>
@@ -178,6 +180,7 @@ export const SignUp = () => {
                     border: "none",
                     borderBottom: "1px solid rgb(4, 4, 62)",
                     outline: "none",
+                    backgroundColor: "#000B21"
                   }}
                 />
                 {isErrorEmail && showError && (
@@ -199,6 +202,7 @@ export const SignUp = () => {
                     border: "none",
                     borderBottom: "1px solid rgb(4, 4, 62)",
                     outline: "none",
+                    backgroundColor: "#000B21"
                   }}
                 />
                 {isErrorPass && showError && (
@@ -279,6 +283,9 @@ export const SignUp = () => {
             </form>
           </div>
         </div>
+        <div className="fixed-bottom-4 right-0 w-80 h-auto z-0">
+            <img src={Triangle} alt="Triangle" />
+          </div>
       </div>
     </div>
   );
