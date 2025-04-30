@@ -252,12 +252,22 @@ export const Profile = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     resetError();
+    event.preventDefault();
+
+    // Validate social media links
+    if (!validateSocialMediaLinks(currentUserData.socials)) {
+      setShowError(true);
+      setErrorMessage("One or more social media links are invalid.");
+
+      return;
+    }
+
     const storedcurrentUserData = {
       mobile: currentUserData.mobile,
       imgurl: typeof currentUserData.profilePicture === "string" ? currentUserData.profilePicture : "",
       desc: convertNewLinesToBRTags(currentUserData.desc),
     };
-    event.preventDefault();
+
     const user = await getUser();
     const { mobile, profilePicture } = currentUserData;
 
@@ -271,7 +281,7 @@ export const Profile = () => {
     if (mobile !== "" && mobile !== userData!.mobile) {
       if (mobile === "") {
         storedcurrentUserData.mobile = null;
-      } else if (mobile&&!mobileRegex.test(mobile)) {
+      } else if (mobile && !mobileRegex.test(mobile)) {
         setShowError(true);
         setMobileInvalid(true);
         setErrorMessage("Invalid mobile number, Please enter a valid number");
@@ -280,7 +290,7 @@ export const Profile = () => {
     }
 
     try {
-      const filteredSocials = currentUserData.socials?.filter(social => social.url !== "");
+      const filteredSocials = currentUserData.socials?.filter((social) => social.url !== "");
       await updateData("users", user.uid, { ...storedcurrentUserData, socials: filteredSocials });
 
       setShowSuccess(true);
@@ -718,50 +728,56 @@ export const Profile = () => {
                       </FormControl>
 
                         <Text fontFamily={'SF-Pro-Display-Bold'} my={4}>Social Media Links: </Text>
-                        <FormControl mb={4} isInvalid={showError && !currentUserData.socials?.every(social => social.url === "" || isValidUrl(social.url))}>
+                        <FormControl
+                          mb={4}
+                          isInvalid={
+                            showError &&
+                            !validateSocialMediaLinks(currentUserData.socials)
+                          }
+                        >
                           <Input
                             type="url"
                             id="Facebook"
                             name="Facebook"
-                            value={currentUserData.socials?.find(social => social.name === "Facebook")?.url || ""}
+                            value={currentUserData.socials?.find((social) => social.name === "Facebook")?.url || ""}
                             onChange={handleChange}
                             placeholder="Facebook URL"
                             mb={4}
                             style={{
-                              width: '80%',
-                              border: 'none',
-                              borderBottom: '1px solid rgb(4, 4, 62)',
-                              outline: 'none',
+                              width: "80%",
+                              border: "none",
+                              borderBottom: "1px solid rgb(4, 4, 62)",
+                              outline: "none",
                             }}
                           />
                           <Input
                             type="url"
                             id="Instagram"
                             name="Instagram"
-                            value={currentUserData.socials?.find(social => social.name === "Instagram")?.url || ""}
+                            value={currentUserData.socials?.find((social) => social.name === "Instagram")?.url || ""}
                             onChange={handleChange}
                             placeholder="Instagram URL"
                             mb={4}
                             style={{
-                              width: '80%',
-                              border: 'none',
-                              borderBottom: '1px solid rgb(4, 4, 62)',
-                              outline: 'none',
+                              width: "80%",
+                              border: "none",
+                              borderBottom: "1px solid rgb(4, 4, 62)",
+                              outline: "none",
                             }}
                           />
                           <Input
                             type="url"
                             id="LinkedIn"
                             name="LinkedIn"
-                            value={currentUserData.socials?.find(social => social.name === "LinkedIn")?.url || ""}
+                            value={currentUserData.socials?.find((social) => social.name === "LinkedIn")?.url || ""}
                             onChange={handleChange}
                             placeholder="LinkedIn URL"
                             mb={4}
                             style={{
-                              width: '80%',
-                              border: 'none',
-                              borderBottom: '1px solid rgb(4, 4, 62)',
-                              outline: 'none',
+                              width: "80%",
+                              border: "none",
+                              borderBottom: "1px solid rgb(4, 4, 62)",
+                              outline: "none",
                             }}
                           />
                           <FormErrorMessage mb={4} fontFamily={"SF-Pro-Text-Medium"}>
@@ -884,7 +900,8 @@ export const Profile = () => {
                 setCurrentFollowing={(userId, updatedFollowing) =>
                 {
                   userId;
-                  setCurrentFollowing(setUserData, { users: updatedFollowing })}
+                  setCurrentFollowing(setUserData, { users: updatedFollowing })
+                }
                 }
                 className="follow-button ml-auto"
                 />
@@ -954,4 +971,22 @@ export const Profile = () => {
       </Modal>
     </div>
   );
+};
+
+const validateSocialMediaLinks = (socials: Social[] | undefined): boolean => {
+  if (!socials) return true;
+
+  const regexPatterns: { [key: string]: RegExp } = {
+    Facebook: /^https?:\/\/(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/,
+    Instagram: /^https?:\/\/(www\.)?instagram\.com\/[a-zA-Z0-9_.]+$/,
+    LinkedIn: /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/
+  };
+
+  for (const social of socials) {
+    const regex = regexPatterns[social.name];
+    if (regex && social.url.trim()!=='' && !regex.test(social.url)) {
+      return false;
+    }
+  }
+  return true;
 };
