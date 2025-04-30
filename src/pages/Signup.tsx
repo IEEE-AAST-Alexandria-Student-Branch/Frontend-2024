@@ -283,7 +283,7 @@ export const SignUp = () => {
             </form>
           </div>
         </div>
-        <div className="fixed-bottom-4 right-0 w-80 h-auto z-0">
+        <div className="fixed -bottom-4 right-0 w-80 h-auto z-0">
             <img src={Triangle} alt="Triangle" />
           </div>
       </div>
