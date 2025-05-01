@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Sponsors } from "../components/EventDetails/Sponsors";
 import { Resources } from "../components/EventDetails/Resources";
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Spinner, Tooltip } from "@chakra-ui/react";
-import PlusIcon from "../assets/plus.png";
+
 import { Schedule } from "../components/EventDetails/Schedule";
 import Gallery from "../components/EventDetails/Gallery";
 import subscribeToDocumentsByField from "../firebase/subscribeToDocumentsByField";
@@ -99,7 +99,6 @@ export const EventDetails = () => {
     disabled={!eventData?.registrationOpen}
   >
     <span className="buttonText">Attend</span>
-    <span className="plusButton"><img src={PlusIcon} alt="plus" /></span>
   </button>
 
   return (loading 
@@ -159,6 +158,11 @@ export const EventDetails = () => {
 
 
           </div>
+          {(eventData?.registrationOpen&&eventData.formLink) ?
+              <Link className="flex justify-center mt-4 sm:hidden" to={eventData.formLink}>{attendButton}</Link>:
+                  <Tooltip label="Event registration link not available yet.">
+                    {attendButton}
+                  </Tooltip>}
           <Tabs variant="unstyled" style={{ margin: "60px 0px" }}>
             <TabList
               bg={"#151F33"}
@@ -189,7 +193,7 @@ export const EventDetails = () => {
                 */ }
               </div>
               {(eventData?.registrationOpen&&eventData.formLink) ?
-              <Link to={eventData.formLink}>{attendButton}</Link>:
+              <Link className="hidden sm:block" to={eventData.formLink}>{attendButton}</Link>:
                   <Tooltip label="Event registration link not available yet.">
                     {attendButton}
                   </Tooltip>}

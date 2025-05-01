@@ -85,31 +85,3 @@ strong{
     height:75%;
     border-radius: 999px;
 }
-
-.plusButton {
-    display:none;
-    width:35px;
-    background-size: contain;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%); 
-}
-
-@media (max-width: 672px) {
-    .plusButton {
-        display:block;
-        width:30px;
-    }
-
-    .chakra-tabs__tablist .defaultButton {
-        min-width:0px;
-        height: fit-content;
-        width: fit-content;
-        background-color: transparent;
-        margin-left:5px;
-    }
-
-    .buttonText {
-        display: none;
-    }
-}
