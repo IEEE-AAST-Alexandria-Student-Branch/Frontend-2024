@@ -86,13 +86,14 @@ function App() {
       if (user) {
         const docRef = await getDocument("users", user.uid);
         if (!docRef.error && docRef.result) {
-          setUserData(docRef.result.data());
+          setUserData(docRef.result.data()); // Update context
           setUserId(user.uid);
         }
-        setLoading(false);
-      } else { setLoading(false) }
+      }
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching user or user data:", error);
+      setLoading(false);
     }
   };
 

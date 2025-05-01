@@ -33,6 +33,9 @@ export const Onboarding = () => {
       if (res.result && !res.error) {
         setUserData(res.result?.data());
         setLoading(false);
+        if (res.result?.data()?.onboarded) {
+          navigate("/");
+        }
       }
     });
   };
@@ -41,6 +44,7 @@ export const Onboarding = () => {
     const storedFormData = {
       mobile: formData.mobile,
       imgurl: "",
+      onboarded: true
     };
 
     const user = await getUser();
@@ -92,7 +96,15 @@ export const Onboarding = () => {
   };
 
   useEffect(() => {
-    fetchUser();
+    const checkUser = async () => {
+      const user = await getUser();
+      if (!user) {
+        navigate("/signin");
+      } else {
+        fetchUser();
+      }
+    };
+    checkUser();
   }, []);
 
   return loading ? (
@@ -160,7 +172,16 @@ export const Onboarding = () => {
             </form>
             <div className="pt-8">
               <Link to="/">
-                <button className="bg-transparent py-2 px-4 w-28 border-2 border-white rounded-full">
+                <button
+                  className="bg-transparent py-2 px-4 w-28 border-2 border-white rounded-full"
+                  onClick={async () => {
+                    const user = await getUser();
+                    if (user) {
+                      await updateData("users", user.uid, { onboarded: true }); // Update onboarded field
+                    }
+                    navigate("/"); // Navigate to the home page
+                  }}
+                >
                   Later
                 </button>
               </Link>

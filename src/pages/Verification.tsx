@@ -31,11 +31,6 @@ export const Verifying = () => {
     checkVerification()
   }, []);
 
-  const reloadPage = () => {
-    if (auth.currentUser)
-      navigate(0);
-  }
-
   return (
     <div className="relative h-screen">
       {loading ? (
@@ -57,7 +52,7 @@ export const Verifying = () => {
             </p>
             <button
               className="bg-white text-black text-sm font-bold py-2 px-4 w-36 border-2 border-white rounded-full m-2"
-              onClick={reloadPage}
+              onClick={()=>{if(auth.currentUser)navigate("/onboard")}}
             >
               Finish
             </button>

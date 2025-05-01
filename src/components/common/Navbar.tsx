@@ -53,7 +53,7 @@ export const NavBar: React.FC<NavBarProps> = ({ hideNavBar }) => {
   const [mobileSearch, setMobileSearch] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation(); // Get the current location
-  const { userData } = useContext(UserContext);
+  const { userData } = useContext(UserContext); // Directly consume userData
   const [searched, setSearched] = useState(''); //search
   const [article, setArticle] = useState<ArticleData[]>([]);
   const [events, setEvents] = useState<EventData[]>([]);

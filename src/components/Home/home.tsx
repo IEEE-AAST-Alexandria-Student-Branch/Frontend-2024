@@ -42,10 +42,7 @@ export const HomeComp = () => {
 
     return (
         <div
-            className={`flex flex-col bg-cover bg-center w-full h-screen overflow-hidden ${
-            appConfig.coverPhoto ? "" : "bg-homeImage"
-            }`}
-            style={{ backgroundImage: appConfig.coverPhoto ? `url(${appConfig.coverPhoto})` : undefined }}
+            className={`flex flex-col bg-cover bg-center w-full h-screen overflow-hidden bg-homeImage`}
         >
             {/* Background Gradient */}
             <div

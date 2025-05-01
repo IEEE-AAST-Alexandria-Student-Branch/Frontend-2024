@@ -1,11 +1,14 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Input, FormControl, FormErrorMessage, List, ListItem } from "@chakra-ui/react";
+import { Input, FormControl, FormErrorMessage, List, ListItem, Button } from "@chakra-ui/react";
 import setData from "../firebase/setData";
 import register from "../firebase/register";
 import Triangle from "../assets/bg-triangle-ellipse@2x.png";
 import { handleGoogleSignIn } from "../utils";
 import getUser from "../firebase/auth";
+import getDocument from "../firebase/getData";
+import { UserContext } from "../App";
+import UserData from "../interfaces/userData";
 
 interface FormData {
   firstName: string;
@@ -15,15 +18,8 @@ interface FormData {
 }
 
 export const SignUp = () => {
-  useEffect(() => {
-    const checkUser = async () => {
-      const user = await getUser();
-      if (user) {
-        navigate("/");
-      }
-    };
-    checkUser();
-  }, []);
+  const { setUserData, setUserId } = useContext(UserContext); // Access UserContext
+  const [loading, setLoading] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
@@ -36,6 +32,7 @@ export const SignUp = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const email = queryParams.get("email");
@@ -76,22 +73,38 @@ export const SignUp = () => {
         likes: { events: [], articles: [] },
         followers: [],
         roles: [],
-        following: { events: [], users: [] }
+        following: { events: [], users: [] },
       };
 
       try {
+        setLoading("email");
         const res = await register(formData.email, formData.password);
         if (res.error) {
           throw new Error(res.error);
+        } else {
+          // Save user data to Firestore
+          await setData("users", storedFormData, res.result?.user.uid);
+
+          // Fetch the newly created user data and update UserContext
+          const user = await getUser();
+          if (user) {
+            const userDoc = await getDocument("users", user.uid);
+            if (userDoc.result && !userDoc.error) {
+              setUserData(userDoc.result.data() as UserData); // Update UserContext
+              setUserId(user.uid); // Update User ID in context
+            }
+          }
+
+          navigate("/verify");
         }
-        await setData("users", storedFormData, res.result?.user.uid);
-        navigate("/verify");
       } catch (error: any) {
         console.error("Error during registration:", error.message);
         alert(`Registration failed: ${error.message}`);
+        setLoading(null);
       }
     } else {
       setShowError(true);
+      setLoading(null);
     }
   };
 
@@ -119,10 +132,10 @@ export const SignUp = () => {
       <div className="form-container relative">
         <div className="p-20 min-h-screen relative z-20">
           <div className="max-w-[600px] mt-40 max-sm:mt-10">
-            <h1 className="text-4xl sm:text-4xl" style={{ fontWeight: "bold" }}>
+            <h1 className="text-4xl text-center sm:text-left sm:text-4xl" style={{ fontWeight: "bold" }}>
               Let's get to know each other
             </h1>
-            <p className="pt-2 pb-10 text-left" style={{ fontWeight: "lighter", fontSize: "13px" }}>
+            <p className="pt-2 pb-10 text-center sm:text-left" style={{ fontWeight: "lighter", fontSize: "13px" }}>
               Tell us who you are. We will send you an email to verify it's you ;)
             </p>
             <form onSubmit={handleSubmit}>
@@ -230,53 +243,64 @@ export const SignUp = () => {
               <Link to="/signin" className="text-blue-500 px-4 mt-4">
                     Already have an account? Sign in!
                   </Link>
-              <div className="flex flex-nowrap">
+              <div className="flex flex-nowrap justify-center sm:justify-start">
                 
                 <div className="pt-8 flex flex-nowrap items-center gap-2 flex-col">
                   <div className="flex flex-col sm:flex-row items-center gap-2">
 
-                    <button
+                    <Button
+                    rounded={"full"}
                       className="defaultButton"
                       style={{
-                        fontSize: "11px",
+                        fontSize: "16px",
                         width: "155px",
-                        height: "35px",
+                        height: "50px",
                       }}
+                      isLoading={loading=="email"}
+                      loadingText="Loading..."
+                      type="submit"
                     >
                       Send Email
-                    </button>
+                    </Button>
 
                     <Link to="/">
-                      <button
+                      <Button
+                        rounded={"full"}
                         style={{
                           background: "transparent",
                           padding: "8px",
-                          width: "120px",
-                          fontSize: "11px",
-                          border: "2px solid #fff",
-                          borderRadius: "20px",
+                          fontSize: "16px",
+                          width: "155px",
+                          height: "50px",
+                          border: "2px solid #fff", 
                           color: "#fff",
                           textAlign: "center",
                         }}
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </Link>
                   </div>
-                  <button
-                className="flex items-center gap-2 bg-white text-black font-medium px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-shadow self-start mt-2"
-                onClick={() => {
-                  handleGoogleSignIn();
-                }}
-                type="button"
-              >
-                <img
-                  src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
-                  alt="Google Logo"
-                  className="w-10 h-10"
-                />
-                Sign in with Google
-              </button>
+                    <Button
+                  className="flex items-center gap-2 bg-white text-black font-medium rounded-full shadow-md hover:shadow-lg transition-shadow self-start mt-2"
+                  rounded={"full"}
+                  p={7}
+                  onClick={() => {
+                    setLoading("google");
+                    handleGoogleSignIn(setLoading);
+                  }}
+                  type="button"
+                  isLoading={loading=="google"}
+                  loadingText="Please wait..."
+                  disabled={loading=="email"}
+                  >
+                  <img
+                    src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+                    alt="Google Logo"
+                    className="w-10 h-10"
+                  />
+                  Sign in with Google
+                  </Button>
                   
                 </div>
               </div>

@@ -205,13 +205,15 @@ export const toggleFollow = async (
   }
 };
 
-export const handleGoogleSignIn = async () => {
+export const handleGoogleSignIn = async (setLoading: (loading: string|null) => void): Promise<void> => {
   const { result, error } = await signInWithGoogle();
   
 
   if (error) {
     console.error(error);
     alert(error);
+    setLoading(null);
+    return;
   } else {
     const storedEmptyUser = {
       firstname: result?.user?.displayName?.split(" ")[0] || "",
