@@ -867,12 +867,12 @@ export const Profile = () => {
         </Tabs>
       </div>
       <div className=" w-full flex justify-center h-fit"></div>
-      <Modal isOpen={showFollowersModal} onClose={() => setShowFollowersModal(false)} isCentered>
+      <Modal isOpen={showFollowersModal} onClose={() => setShowFollowersModal(false)} isCentered size={"xl"}>
         <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
         <ModalHeader fontSize={"2xl"}>Followers</ModalHeader>
         <ModalCloseButton />
-        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center">
+        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center customScrollbar" maxHeight={"70vh"} overflowY="auto">
           
             {showFollowersModal && selectedUserData?.followers && selectedUserData.followers.length > 0 ?(
           
@@ -919,12 +919,12 @@ export const Profile = () => {
           </ModalContent>
       </Modal>
 
-      <Modal isOpen={showFollowingModal} onClose={() => setShowFollowingModal(false)} isCentered>
+      <Modal isOpen={showFollowingModal} onClose={() => setShowFollowingModal(false)} isCentered size={"xl"}>
         <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
         <ModalHeader fontSize={"2xl"}>Following</ModalHeader>
         <ModalCloseButton />
-        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center ">
+        <ModalBody minHeight="200px" className="flex flex-col gap-4 items-center customScrollbar" maxHeight={"70vh"} overflowY="auto">
           
             {showFollowingModal && selectedUserData?.following?.users && selectedUserData.following.users.length > 0 ?(
           
