@@ -181,6 +181,7 @@ const Footer = () => {
                   .then(() => {
                     alert("Feedback sent successfully!");
                     setSubmitting(false);
+                    setFeedback("");
                   })
                   .catch((error) => {
                     console.error("Error sending feedback:", error);
