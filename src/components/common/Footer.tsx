@@ -9,6 +9,7 @@ import {
   ModalCloseButton,
   Button,
   Textarea,
+  Checkbox,
 } from "@chakra-ui/react";
 import FAQ from "../../assets/faq-bubble-white.png";
 import Feedback from "../../assets/feedback.png";
@@ -54,6 +55,7 @@ const Footer = () => {
   const [submitting, setSubmitting] = useState(false);
   const appConfig = useContext(AppConfigContext).appConfig;
   const {userId} = useContext(UserContext);
+  const [anonymous, setAnonymous] = useState((userId==null? true : false));
 
   useEffect(() => {
     SocialInfo[1].link = `mailto:${appConfig.contactEmail}`;
@@ -157,6 +159,16 @@ const Footer = () => {
                 onChange={(e) => {setFeedback(e.target.value);}}
                 value={feedback}
               />
+                <Checkbox
+                className="mt-2"
+                isChecked={anonymous}
+                isDisabled={userId === null}
+                onChange={(e) => {
+                  setAnonymous(e.target.checked);
+                }}
+                >
+                Stay anonymous?
+                </Checkbox>
             </ModalBody>
             <ModalFooter>
               <Button
@@ -176,7 +188,7 @@ const Footer = () => {
                 await addData("feedback", {
                   feedback: feedback,
                   date: new Date().toISOString(),
-                  from: userId
+                  from: anonymous ? null : userId,
                 })
                   .then(() => {
                     alert("Feedback sent successfully!");
