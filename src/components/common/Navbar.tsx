@@ -140,11 +140,13 @@ export const NavBar: React.FC<NavBarProps> = ({ hideNavBar }) => {
   const handleClick = (handled: string) => {
     if (filterArticles?.includes(handled)) {
       navigate(`/article/${handled}`);
+      
     } else if (filterEvents?.includes(handled)) {
       navigate(`/event/${handled}`);
     } else {
       console.log("no nav found")
     }
+    setSearched('');
   };
 
   useEffect(() => {

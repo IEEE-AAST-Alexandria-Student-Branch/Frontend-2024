@@ -1,12 +1,13 @@
 import "./styles/MainContent.css";
 import { LikeSaveShare } from "./LikeSaveShare";
-import { Modal } from "../Modal/Modal";
-import { useState, useEffect, useCallback } from "react";
+import { FollowButton } from "../../common/FollowButton.js";
+import { useState, useEffect, useCallback, useContext } from "react";
 import getDocument from "../../../firebase/getData.js";
 import { Timestamp } from "@firebase/firestore";
 import ArticleData from "../../../interfaces/ArticleData.js";
 import subscribeToDocumentsByField from "../../../firebase/subscribeToDocumentsByField.js";
 import UserData from "../../../interfaces/userData.js";
+import { UserContext } from "../../../App.js";
 import { Link } from "react-router-dom";
 
 interface MainContentProps {
@@ -19,22 +20,15 @@ interface AuthorData {
 }
 
 export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
-  const [isFollowing, setIsFollowing] = useState(true);
-  const [modal, setModal] = useState(false);
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
   const [author, setAuthor] = useState<AuthorData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const toggleModal = () => {
-    document.body.style.overflow = modal ? "auto" : "hidden";
-    setModal(!modal);
-  };
+  const { userData, userId } = useContext(UserContext)
 
   const fetchArticle = useCallback(async () => {
     const unsubscribe = subscribeToDocumentsByField("articles", "title", "==", articleName, async (data: any) => {
       const article = (data.result?.[0] as ArticleData) || null;
       setArticleData(article);
-
       if (article?.author) {
         const authorData = await getDocument("users", article.author);
         setAuthor(authorData.result ? { userData: authorData.result.data() as UserData, id: authorData.result.id } : null);
@@ -60,9 +54,6 @@ export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
     });
   };
 
-  const toggleFollow = () => {
-    setIsFollowing(!isFollowing);
-  };
 
   if (loading || !articleData || !author) {
     return <div>Loading...</div>;
@@ -72,6 +63,7 @@ export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
     <div className="main-content">
       <span className="title">{articleData.title}</span>
       <span className="description">{articleData.description}</span>
+      <div className="flex items-center">
       <Link to={`/profile/${articleData.author}`} className="profile">
         <div className="pfp">
           <img
@@ -80,18 +72,34 @@ export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
           />
         </div>
         <div className="profile-desc">
-          <span className="desc-title">
+          <div className="flex items-center">
+          <span className="desc-title opacity-80">
             {`${author?.userData?.firstname} ${author?.userData?.lastname}`} •
-            <span
-              onClick={toggleFollow}
-              style={{ color: isFollowing ? "dodgerblue" : "" }}
-            >
-              {isFollowing ? "Follow" : "Following"}
-            </span>
           </span>
-          <p className="desc-time w-fit">{formatDate(articleData.publishdate)}</p>
+
+            </div>
+          <p className="desc-time w-fit opacity-80">{formatDate(articleData.publishdate)}</p>
         </div>
       </Link>
+      <FollowButton
+              targetUserData={author?.userData}
+              currentUserData={userData}
+              targetUserId={author?.id || ""}
+              currentUserId={userId || ""}
+              className="ml-2 z-20"
+              setTargetFollowers={(_userId, updatedFollowers) => {
+                if (author?.userData) {
+                  setAuthor((prev) => {
+                    if (!prev || !prev.userData) return prev;
+                    return {
+                      ...prev,
+                      userData: { ...prev.userData, followers: updatedFollowers },
+                    };
+                  });
+                }
+              }}
+            />
+        </div>
       <hr />
       <LikeSaveShare article={articleData} />
       <hr />
@@ -108,13 +116,6 @@ export const MainContent: React.FC<MainContentProps> = ({ articleName }) => {
       <a href={`/profile/${author.id}`}>
         More from {`${author?.userData?.firstname} ${author?.userData?.lastname}`}
       </a>
-      <hr />
-      <a onClick={toggleModal}>
-        <u>Report</u>
-      </a>
-      <hr />
-      <a href="">Help</a>
-      {modal && <Modal closeModal={setModal} />}
     </div>
   );
 };

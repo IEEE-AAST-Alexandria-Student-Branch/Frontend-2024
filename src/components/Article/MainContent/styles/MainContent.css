@@ -37,7 +37,6 @@
     flex-direction: column;
     margin: 10px;
     color: white;
-    opacity: 0.7;
 }
 
 .desc-title {
@@ -113,7 +112,6 @@
     font-size: 14px;
     text-align: center;
     color: white;
-    opacity: 0.8;
     margin: 5px 0px;
 }
 

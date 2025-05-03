@@ -1,4 +1,3 @@
-import More from "../../../assets/more-ellipsis-white.png";
 import React from "react";
 import ArticleData from "../../../interfaces/ArticleData.js";
 import { LikeButton } from "../../common/LikeButton.js";
@@ -18,11 +17,6 @@ export const LikeSaveShare: React.FC<LikeSaveShareProps> = ({ article }) => {
           <BookMarkButton item={article} />
         </div>
         <div>
-          <img
-            src={More}
-            alt="More"
-            style={{ cursor: 'pointer' }}
-          />
         </div>
       </div>
     </div>

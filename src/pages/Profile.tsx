@@ -410,6 +410,12 @@ export const Profile = () => {
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
             <ModalHeader fontSize={"2xl"}>Change Cover Photo</ModalHeader>
+            {!(currentUserData.profilePicture instanceof File) && <>
+            <Text fontSize="sm" textAlign={"center"} color="gray.500" mb={2}>
+              Please use a landscape image for best results.<br></br>
+              Max file size is 2MB.
+            </Text>
+            </>}
             <ModalCloseButton />
             <ModalBody>
                 <FormControl className="flex flex-col items-center w-full">
@@ -511,6 +517,11 @@ export const Profile = () => {
           <ModalOverlay />
           <ModalContent backgroundColor={"#151F33"}>
             <ModalHeader fontSize={"2xl"}>Change Profile Picture</ModalHeader>
+            {!(currentUserData.profilePicture instanceof File) && <>
+            <Text fontSize="sm" textAlign={"center"} color="gray.500" mb={2}>
+              Max file size is 2MB.
+            </Text>
+            </>}
             <ModalCloseButton />
             <ModalBody>
               <FormControl className="flex flex-col items-center w-full">
